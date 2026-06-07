@@ -115,15 +115,5 @@ precision highp float;
 precision highp int;
 `;
 
-// ============================================================
-// 默认的顶点属性布局 (可被外层覆盖)
-// ============================================================
-
-export const DEFAULT_VERTEX_ATTRIBUTES = {
-  position: { location: 0, type: 'vec3', name: 'aPosition' },
-  uv: { location: 1, type: 'vec2', name: 'aUV' },
-  normal: { location: 2, type: 'vec3', name: 'aNormal' },
-  tangent: { location: 3, type: 'vec4', name: 'aTangent' },
-} as const;
-
-export type VertexAttributeLayout = typeof DEFAULT_VERTEX_ATTRIBUTES;
+// 默认顶点属性布局 — 从 ShaderGraphTypes 重新导出
+export { DEFAULT_VERTEX_ATTRIBUTES } from './ShaderGraphTypes';

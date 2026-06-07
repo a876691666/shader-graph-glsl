@@ -1,22 +1,16 @@
 {
   "name": "shader-graph-glsl",
-  "version": "0.0.0",
-  "description": "shader graph for GLSL (WebGL2 / renderer-agnostic)",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
-  "files": [
-    "src",
-    "README.md",
-    "package.json"
-  ],
-  "sideEffects": [
-    "*.less"
-  ],
+  "version": "0.1.0",
+  "private": true,
+  "description": "shader graph for GLSL (WebGL2 / renderer-agnostic) — monorepo",
   "scripts": {
     "dev": "vite",
+    "dev:docs": "pnpm --filter @shader-graph-glsl/docs dev",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build:editor": "vite build --config vite.config.editor.ts && pnpm -s exec node -e \"require('fs').renameSync('apps/docs/public/editor/editor.html','apps/docs/public/editor/index.html')\"",
+    "build:docs": "pnpm build:editor && pnpm --filter @shader-graph-glsl/docs build",
+    "preview": "vite preview",
+    "preview:docs": "pnpm --filter @shader-graph-glsl/docs preview"
   },
   "keywords": [
     "node material",

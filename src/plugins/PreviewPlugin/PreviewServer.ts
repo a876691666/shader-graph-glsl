@@ -74,7 +74,7 @@ export class PreviewServer {
       antialias: true,
     });
     this.ctx = this.renderer.getContext() as any;
-    this.renderer.setClearColor(new Color(0, 0, 0, 0), 0);
+    this.renderer.setClearColor(new Color(0, 0, 0), 0);
     this.renderer.autoClear = false;
 
     this.mainMaterial = new RawShaderMaterial() as any;

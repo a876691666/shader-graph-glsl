@@ -174,14 +174,14 @@ export class SGController {
       const unifromKey = compilation.uniformMap[contextKey];
       // GLSL type → Three.js uniform type
       const type = glslToThreeUniformType(unifromKey.type);
-      material.uniforms[unifromKey.name] = { value, type };
+      (material.uniforms as any)[unifromKey.name] = { value, type };
     });
 
     Object.keys(compilation.bindingMap).forEach(contextKey => {
       const binding = compilation.bindingMap[contextKey];
       if (!material.uniforms[binding.name] && !compilation.resource.texture[contextKey]) {
         const type = glslToThreeUniformType(binding.type);
-        material.uniforms[binding.name] = { value: null, type };
+        (material.uniforms as any)[binding.name] = { value: null, type };
       }
     });
 
@@ -190,9 +190,9 @@ export class SGController {
       const asset = compilation.resource.texture[contextKey];
       // 使用 bindingMap 中的变量名作为 uniform 键名，与 GLSL shader 中声明的名字一致
       const uniformName = compilation.bindingMap[contextKey]?.name || contextKey;
-      if (!material.uniforms[uniformName])
-        material.uniforms[uniformName] = { value: undefined, type: 't' };
-      material.uniforms[uniformName].value = await loadTexture(asset);
+      if (!(material.uniforms as any)[uniformName])
+        (material.uniforms as any)[uniformName] = { value: undefined, type: 't' };
+      (material.uniforms as any)[uniformName].value = await loadTexture(asset);
     });
 
     await Promise.all([...resourcePromises, ...uniformPromises]);

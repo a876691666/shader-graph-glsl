@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Editor build output (static assets for docs)
+apps/docs/public/editor
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

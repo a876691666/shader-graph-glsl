@@ -1,0 +1,32 @@
+{
+  "name": "@shader-graph-glsl/runtime",
+  "version": "0.1.0",
+  "description": "Shader Graph GLSL Runtime Engine — lightweight WebGL2 renderer, framework-agnostic",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo 'No tests yet'"
+  },
+  "keywords": [
+    "shader-graph",
+    "glsl",
+    "webgl2",
+    "runtime",
+    "renderer"
+  ],
+  "license": "MIT",
+  "peerDependencies": {},
+  "dependencies": {}
+}
