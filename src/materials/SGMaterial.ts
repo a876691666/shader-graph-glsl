@@ -1,7 +1,7 @@
 import { RawShaderMaterial } from 'three';
 import { SGController } from './SGController';
 
-export class WebGPUMaterial extends RawShaderMaterial {
+export class SGMaterial extends RawShaderMaterial {
   sg: SGController;
 
   constructor() {

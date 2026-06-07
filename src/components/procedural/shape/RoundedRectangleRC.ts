@@ -62,18 +62,18 @@ export class RoundedRectangleRC extends RC {
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2<f32>, Width: f32, Height: f32, Radius_: f32) -> f32 {
-  let Radius = max(min(min(abs(Radius_ * 2.), abs(Width)), abs(Height)), 1e-5);
-  let uv = abs(UV * 2. - 1.) - vec2<f32>(Width, Height) + Radius;
-  let d = length(max(uv, vec2<f32>(0.0))) / Radius;
+    const codeFn = (varName: string) => `
+float ${varName}(vec2 UV, float Width, float Height, float Radius_) {
+  float Radius = max(min(min(abs(Radius_ * 2.), abs(Width)), abs(Height)), 1e-5);
+  vec2 uv = abs(UV * 2. - 1.) - vec2(Width, Height) + Radius;
+  float d = length(max(uv, vec2(0.0))) / Radius;
   return clamp((1. - d) / fwidth(d), 0.0, 1.0);
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar}, ${radiusVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar}, ${radiusVar});`,
     };
   }
 }

@@ -46,7 +46,7 @@ export class HyperbolicTangentRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = tanh(${inVar});`,
+      code: `${outVar} = (1.0 - exp(-2.0 * ${inVar})) / (1.0 + exp(-2.0 * ${inVar}));`,
     };
   }
 }

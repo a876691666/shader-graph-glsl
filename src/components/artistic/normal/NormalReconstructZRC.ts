@@ -48,7 +48,7 @@ export class NormalReconstructZRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = normalize(vec3f(${inVar}.x, ${inVar}.y, sqrt(1.0 - clamp(dot(${inVar}.xy, ${inVar}.xy), 0., 1.0))));`,
+      code: `${outVar} = normalize(vec3(${inVar}.x, ${inVar}.y, sqrt(1.0 - clamp(dot(${inVar}.xy, ${inVar}.xy), 0., 1.0))));`,
     };
   }
 }

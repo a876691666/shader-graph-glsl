@@ -51,21 +51,21 @@ export class NormalRC extends RC {
       let code = '';
       if (space === 'world') {
         const IT_ModelVar = TransformationMatrixRC.initMatrixContext(compiler, 'IT_Model');
-        code = `let ${vertVar} = mat3x3<f32>(${IT_ModelVar}[0].xyz, ${IT_ModelVar}[1].xyz, ${IT_ModelVar}[2].xyz) * (*normalOS);`;
+        code = `vec3 ${vertVar} = mat3(${IT_ModelVar}[0].xyz, ${IT_ModelVar}[1].xyz, ${IT_ModelVar}[2].xyz) * normalOS;`;
       } else if (space === 'view') {
         const IT_ModelViewVar = TransformationMatrixRC.initMatrixContext(compiler, 'IT_ModelView');
-        code = `let ${vertVar} = mat3x3<f32>(${IT_ModelViewVar}[0].xyz, ${IT_ModelViewVar}[1].xyz, ${IT_ModelViewVar}[2].xyz) * (*normalOS);`;
+        code = `vec3 ${vertVar} = mat3(${IT_ModelViewVar}[0].xyz, ${IT_ModelViewVar}[1].xyz, ${IT_ModelViewVar}[2].xyz) * normalOS;`;
       } else {
-        code = `let ${vertVar} = vec3<f32>(0, 0, 1);`; // TODO
+        code = `vec3 ${vertVar} = vec3(0, 0, 1);`; // TODO
       }
       compiler.setContext('vertShared', node, key, { varName: vertVar, code });
     }
-    const varyingVar = compiler.setContext('varyings', node, key, varName => `${varName}: vec3<f32>`);
+    const varyingVar = compiler.setContext('varyings', node, key, varName => `vec3 ${varName}`);
     const fragVar = compiler.setContext(
       'fragShared',
       node,
       key,
-      varName => `let ${varName} = normalize(${varyingVar});`,
+      varName => `vec3 ${varName} = normalize(${varyingVar});`,
     );
     const defVar = compiler.setVarNameMap(node, key + '_def', vertVar, fragVar);
     compiler.setAutoVaryings(node, key, varyingVar, vertVar);

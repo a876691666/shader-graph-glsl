@@ -5,7 +5,7 @@ import { Rete } from '../../types';
 import ReactDOM from 'react-dom';
 import { stopPropagation } from '../utils';
 import { basicSetup, EditorView } from 'codemirror';
-import { wgsl } from '@iizukak/codemirror-lang-wgsl';
+import { cpp } from '@codemirror/lang-cpp';
 import { Annotation, EditorState } from '@codemirror/state';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { getOffset } from '../../rete/view/utils';
@@ -25,18 +25,18 @@ interface CustomFunctionViewProps {
 const ExampleCode = `// Custom Function 示例
 
 // 注意事项: 
-// 本代码将直接写入到wgsl内, 需注意复制后导致函数重复定义
+// 本代码将直接写入到GLSL内, 需注意复制后导致函数重复定义
 // 但会复用完全相同的代码片段
 
-fn myOtherFn2() -> f32 {
+float myOtherFn2() {
   return 0.2;
 }
 
 // FnName 填写的函数名 主函数入口 可以定义所需要辅助函数
 // 数据获取, 如UV Position 均可由有SG对应节点提供
-// FN_ARGS 等效于 A: f32, B: f32, Out: ptr<function, f32>
-fn myAdd2(FN_ARGS) {
-  *Out = A + B + myOtherFn2();
+// FN_ARGS 会被替换为: float A, float B, out float Out
+void myAdd2(FN_ARGS) {
+  Out = A + B + myOtherFn2();
 }`;
 
 const ExampleNode = {
@@ -93,7 +93,7 @@ export const CustomFunctionView: FC<CustomFunctionViewProps> = ({ node, onChange
         doc: node.data.codeValue,
         extensions: [
           basicSetup,
-          wgsl(),
+          cpp(),
           oneDark,
           EditorState.tabSize.of(2),
           keymap.of([indentWithTab]),

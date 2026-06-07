@@ -62,15 +62,15 @@ export class RotateAboutAxisRC extends RC {
     const typeClass = compiler.getTypeClass(node.data.outValueType);
 
     const isDeg = node.data.unitValue === 'degrees';
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(in_: vec3<f32>, axis_: vec3<f32>, ${isDeg ? 'rotate_deg' : 'rotate_rad'}: f32) -> ${typeClass} {
-  ${isDeg ? 'let rotate_rad = radians(rotate_deg);' : ''}
-  let s = sin(rotate_rad);
-  let c = cos(rotate_rad);
-  let one_minus_c = 1.0 - c;
+    const codeFn = (varName: string) => `
+${typeClass} ${varName}(vec3 in_, vec3 axis_, float ${isDeg ? 'rotate_deg' : 'rotate_rad'}) {
+  ${isDeg ? 'float rotate_rad = radians(rotate_deg);' : ''}
+  float s = sin(rotate_rad);
+  float c = cos(rotate_rad);
+  float one_minus_c = 1.0 - c;
 
-  let axis = normalize(axis_);
-  let rot_mat = mat3x3<f32>(
+  vec3 axis = normalize(axis_);
+  mat3 rot_mat = mat3(
     one_minus_c * axis.x * axis.x + c, one_minus_c * axis.x * axis.y + axis.z * s, one_minus_c * axis.z * axis.x - axis.y * s,
     one_minus_c * axis.x * axis.y - axis.z * s, one_minus_c * axis.y * axis.y + c, one_minus_c * axis.y * axis.z + axis.x * s,
     one_minus_c * axis.z * axis.x + axis.y * s, one_minus_c * axis.y * axis.z - axis.x * s, one_minus_c * axis.z * axis.z + c
@@ -81,7 +81,7 @@ fn ${varName}(in_: vec3<f32>, axis_: vec3<f32>, ${isDeg ? 'rotate_deg' : 'rotate
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVarName}(${inVar}, ${axisVar}, ${rotateVar});`,
+      code: `${outVar} = ${fnVarName}(${inVar}, ${axisVar}, ${rotateVar});`,
     };
   }
 }

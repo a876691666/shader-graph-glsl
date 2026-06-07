@@ -45,7 +45,7 @@ export class SineRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = sin(${inVar});`,
+      code: `${outVar} = sin(${inVar});`,
     };
   }
 }

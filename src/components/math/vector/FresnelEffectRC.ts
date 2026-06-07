@@ -60,8 +60,8 @@ export class FresnelEffectRC extends RC {
     const powerVar = compiler.getInputVarConverted(node, 'power');
     const typeClass = compiler.getTypeClass(node.data.outValueType);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(normal: vec3<f32>, viewDir: vec3<f32>, power: f32) -> ${typeClass} {
+    const codeFn = (varName: string) => `
+${typeClass} ${varName}(vec3 normal, vec3 viewDir, float power) {
   return pow( (1.0 - clamp(dot(normalize(normal), normalize(viewDir)), 0.0, 1.0) ), power);
 }`;
     const fnVarName = compiler.setContext('defines', node, node.data.outValueType, codeFn);
@@ -71,7 +71,7 @@ fn ${varName}(normal: vec3<f32>, viewDir: vec3<f32>, power: f32) -> ${typeClass}
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVarName}(${normalVar}, ${viewDirVar}, ${powerVar});`,
+      code: `${outVar} = ${fnVarName}(${normalVar}, ${viewDirVar}, ${powerVar});`,
     };
   }
 }

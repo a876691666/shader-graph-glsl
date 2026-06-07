@@ -71,26 +71,26 @@ export class VoronoiRC extends RC {
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}_rand (UV_: vec2<f32>, offset: f32) -> vec2<f32> {
-  let m = mat2x2<f32>(15.27, 47.63, 99.41, 89.98);
-  let UV = fract(sin(UV_ * m) * 46839.32);
-  return vec2<f32>(sin(UV.y*offset) * 0.5+0.5, cos(UV.x*offset)*0.5+0.5);
+    const codeFn = (varName: string) => `
+vec2 ${varName}_rand (vec2 UV_, float offset) {
+  mat2 m = mat2(15.27, 47.63, 99.41, 89.98);
+  vec2 UV = fract(sin(UV_ * m) * 46839.32);
+  return vec2(sin(UV.y*offset) * 0.5+0.5, cos(UV.x*offset)*0.5+0.5);
 }
 
-fn ${varName}(UV: vec2<f32>, AngleOffset: f32, CellDensity: f32) -> vec2<f32> {
-  let g = floor(UV * CellDensity);
-  let f = fract(UV * CellDensity);
-  let t = 8.0;
-  var res = vec3<f32>(8.0, 0.0, 0.0);
+vec2 ${varName}(vec2 UV, float AngleOffset, float CellDensity) {
+  vec2 g = floor(UV * CellDensity);
+  vec2 f = fract(UV * CellDensity);
+  float t = 8.0;
+  vec3 res = vec3(8.0, 0.0, 0.0);
 
-  for(var y: i32 = -1 ; y <= 1; y++){
-    for(var x: i32 = -1; x <= 1; x++){
-      let lattice = vec2<f32>(f32(x),f32(y));
-      let offset = ${varName}_rand(lattice + g, AngleOffset);
-      let d = distance(lattice + offset, f);
+  for(int y_ = -1 ; y_ <= 1; y_++){
+    for(int x_ = -1; x_ <= 1; x_++){
+      vec2 lattice = vec2(float(x_),float(y_));
+      vec2 offset = ${varName}_rand(lattice + g, AngleOffset);
+      float d = distance(lattice + offset, f);
       if(d < res.x){
-        res = vec3<f32>(d, offset.x, offset.y);
+        res = vec3(d, offset.x, offset.y);
       }
     }
   }
@@ -100,7 +100,7 @@ fn ${varName}(UV: vec2<f32>, AngleOffset: f32, CellDensity: f32) -> vec2<f32> {
 
     return {
       outputs: { out: outVar + '.x', cell: outVar + '.y' },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${angleOffsetVar}, ${cellDensityVar});`,
+      code: `vec2 ${outVar} = ${fnVar}(${uvVar}, ${angleOffsetVar}, ${cellDensityVar});`,
     };
   }
 }

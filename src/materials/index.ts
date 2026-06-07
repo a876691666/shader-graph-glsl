@@ -1,4 +1,5 @@
 export * from './ResourceAdapter';
 export * from './SGController';
-export * from './WebGPUMaterial';
-export * from './WebGPURenderer';
+export * from './SGMaterial';
+export * from './dispose';
+export * from './GLSLRenderer';

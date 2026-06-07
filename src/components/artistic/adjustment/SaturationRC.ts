@@ -49,8 +49,8 @@ export class SaturationRC extends RC {
     const [saturationVar, inVar] = compiler.getInputVarConvertedArray(node, ['saturation', 'in']);
     return {
       outputs: { out: outVar },
-      code: `let ${outVar}_luma = dot(${inVar}, vec3<f32>(0.2126729, 0.7151522, 0.0721750));
-  let ${outVar} = ${outVar}_luma + ${saturationVar} * (${inVar} - ${outVar}_luma);`,
+      code: `float ${outVar}_luma = dot(${inVar}, vec3(0.2126729, 0.7151522, 0.0721750));
+  vec3 ${outVar} = ${outVar}_luma + ${saturationVar} * (${inVar} - ${outVar}_luma);`,
     };
   }
 }

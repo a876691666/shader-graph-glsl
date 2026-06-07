@@ -58,19 +58,19 @@ export class SpherizeRC extends RC {
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2f, Center: vec2f, Strength: vec2f, Offset: vec2f) -> vec2f {
-  let delta = UV - Center;
-  let delta2 = dot(delta.xy, delta.xy);
-  let delta4 = delta2 * delta2;
-  let delta_offset = delta4 * Strength;
+    const codeFn = (varName: string) => `
+vec2 ${varName}(vec2 UV, vec2 Center, vec2 Strength, vec2 Offset) {
+  vec2 delta = UV - Center;
+  float delta2 = dot(delta.xy, delta.xy);
+  float delta4 = delta2 * delta2;
+  vec2 delta_offset = delta4 * Strength;
   return UV + delta * delta_offset + Offset;
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${strengthVar}, ${offsetVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${strengthVar}, ${offsetVar});`,
     };
   }
 }

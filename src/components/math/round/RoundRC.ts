@@ -45,7 +45,7 @@ export class RoundRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = round(${inVar});`,
+      code: `${outVar} = floor(${inVar} + 0.5);`,
     };
   }
 }

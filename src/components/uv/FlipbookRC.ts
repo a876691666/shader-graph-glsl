@@ -67,19 +67,19 @@ export class FlipBookRC extends RC {
 
     const invertX = node.data.invertXValue;
     const invertY = node.data.invertYValue;
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2f, Width: f32, Height: f32, Tile_: f32, Invert: vec2f) -> vec2f {
-  let Tile = Tile_ % (Width * Height);
-  let tileCount = vec2f(1.0, 1.0) / vec2f(Width, Height);
-  let tileY = abs(Invert.y * Height - (floor(Tile * tileCount.x) + Invert.y * 1.0));
-  let tileX = abs(Invert.x * Width - ((Tile - Width * floor(Tile * tileCount.x)) + Invert.x * 1.0));
-  return (UV + vec2f(tileX, tileY)) * tileCount;
+    const codeFn = (varName: string) => `
+vec2 ${varName}(vec2 UV, float Width, float Height, float Tile_, vec2 Invert) {
+  float Tile = mod(Tile_, (Width * Height));
+  vec2 tileCount = vec2(1.0, 1.0) / vec2(Width, Height);
+  float tileY = abs(Invert.y * Height - (floor(Tile * tileCount.x) + Invert.y * 1.0));
+  float tileX = abs(Invert.x * Width - ((Tile - Width * floor(Tile * tileCount.x)) + Invert.x * 1.0));
+  return (UV + vec2(tileX, tileY)) * tileCount;
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
-    const invertVar = `vec2f(${invertX ? '1.' : '0.'}, ${invertY ? '1.' : '0.'})`;
+    const invertVar = `vec2(${invertX ? '1.' : '0.'}, ${invertY ? '1.' : '0.'})`;
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar}, ${tileVar}, ${invertVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar}, ${tileVar}, ${invertVar});`,
     };
   }
 }

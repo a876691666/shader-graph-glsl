@@ -2,14 +2,28 @@ import { PerspectiveCamera, RawShaderMaterial } from 'three';
 import { ReteNode } from '../../types';
 import { MaterialTemplates } from '../../templates';
 import { SGCompilation } from '../../compilers';
-import { WebGPUMaterial, disposeMaterial } from '../../materials';
+import { SGController } from '../../materials';
 
 export class PreviewClient {
   enable: boolean = false;
   type: '2d' | '3d' = '2d';
-  material = new WebGPUMaterial();
+  material: RawShaderMaterial & { sg: SGController };
 
-  constructor(public canvas: HTMLDivElement & { clientWidth_cache?: number; clientHeight_cache?: number }, public node?: ReteNode) {}
+  constructor(public canvas: HTMLDivElement & { clientWidth_cache?: number; clientHeight_cache?: number }, public node?: ReteNode) {
+    const mat = new RawShaderMaterial() as any;
+    mat.sg = new SGController(mat);
+    // 默认有效 shader，避免首次渲染报错
+    mat.vertexShader = `#version 300 es
+      layout(location = 0) in vec3 position;
+      uniform mat4 projectionMatrix;
+      uniform mat4 modelViewMatrix;
+      void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+    mat.fragmentShader = `#version 300 es
+      precision highp float;
+      layout(location = 0) out vec4 fragColor;
+      void main() { fragColor = vec4(0.0, 0.0, 0.0, 0.0); }`;
+    this.material = mat;
+  }
 
   get weight() {
     if (!this.node) return 2;
@@ -42,7 +56,7 @@ export class PreviewClient {
   }
 
   dispose() {
-    disposeMaterial(this.material);
+    this.material.dispose();
   }
 }
 

@@ -100,10 +100,10 @@ export class BlendRC extends RC {
       mixMidVar = `${blendVar} + ${baseVar} - (2.0 * ${blendVar} * ${baseVar})`;
     } else if (mode === 'HardLight' || mode === 'Overlay') {
       code = `
-  let ${outVar}_result1 = 1.0 - 2.0 * (1.0 - ${baseVar}) * (1.0 - ${blendVar});
-  let ${outVar}_result2 = 2.0 * ${baseVar} * ${blendVar};
-  let ${outVar}_zeroOrOne = step(0.5, ${blendVar});
-  let ${outVar} = mix(${baseVar}, ${outVar}_result2 * ${outVar}_zeroOrOne + (1.0 - ${outVar}_zeroOrOne) * ${outVar}_result1, ${opacityVar});
+  ${outVar}_result1 = 1.0 - 2.0 * (1.0 - ${baseVar}) * (1.0 - ${blendVar});
+  ${outVar}_result2 = 2.0 * ${baseVar} * ${blendVar};
+  ${outVar}_zeroOrOne = step(0.5, ${blendVar});
+  ${outVar} = mix(${baseVar}, ${outVar}_result2 * ${outVar}_zeroOrOne + (1.0 - ${outVar}_zeroOrOne) * ${outVar}_result1, ${opacityVar});
 `;
     } else if (mode === 'HardMix') {
       mixMidVar = `step(1. - ${baseVar}, ${blendVar})`;
@@ -115,9 +115,9 @@ export class BlendRC extends RC {
       mixMidVar = `${baseVar} + ${blendVar}`;
     } else if (mode === 'LinearLight') {
       code = `
-  let ${outVar}_check = step(0.5, ${blendVar});
-  let ${outVar}_result1 = ${outVar}_check * max(${baseVar} + (2. * ${blendVar}) - 1., 0.);
-  let ${outVar} = mix(${baseVar}, ${outVar}_result1 + (1.0 - ${outVar}_check) * min(${baseVar} + 2. * (${blendVar} - 0.5), 1.), ${opacityVar});
+  ${outVar}_check = step(0.5, ${blendVar});
+  ${outVar}_result1 = ${outVar}_check * max(${baseVar} + (2. * ${blendVar}) - 1., 0.);
+  ${outVar} = mix(${baseVar}, ${outVar}_result1 + (1.0 - ${outVar}_check) * min(${baseVar} + 2. * (${blendVar} - 0.5), 1.), ${opacityVar});
 `;
     } else if (mode === 'LinearLightAddSub') {
       mixMidVar = `${blendVar} + 2.0 * ${baseVar} - 1.0`;
@@ -127,28 +127,28 @@ export class BlendRC extends RC {
       mixMidVar = `1.0 - abs(1.0 - ${blendVar} - ${baseVar})`;
     } else if (mode === 'PinLight') {
       code = `
-  let ${outVar}_check = step(0.5, ${blendVar});
-  let ${outVar}_result1 = ${outVar}_check * max(2.0 * (${baseVar} - 0.5), ${blendVar});
-  let ${outVar} = mix(${baseVar}, ${outVar}_result1 + (1.0 - ${outVar}_check) * min(2.0 * ${baseVar}, ${blendVar}), ${opacityVar});
+  ${outVar}_check = step(0.5, ${blendVar});
+  ${outVar}_result1 = ${outVar}_check * max(2.0 * (${baseVar} - 0.5), ${blendVar});
+  ${outVar} = mix(${baseVar}, ${outVar}_result1 + (1.0 - ${outVar}_check) * min(2.0 * ${baseVar}, ${blendVar}), ${opacityVar});
 `;
     } else if (mode === 'Screen') {
       mixMidVar = `1.0 - (1.0 - ${blendVar}) * (1.0 - ${baseVar})`;
     } else if (mode === 'SoftLight') {
       code = `
-  let ${outVar}_result1 = 2.0 * ${baseVar} * ${blendVar} + ${baseVar} * ${baseVar} * (1.0 - 2.0 * ${blendVar});
-  let ${outVar}_result2 = sqrt(${baseVar}) * (2.0 * ${blendVar} - 1.0) + 2.0 * ${baseVar} * (1.0 - ${blendVar});
-  let ${outVar}_zeroOrOne = step(0.5, ${blendVar});
-  let ${outVar} = mix(${baseVar}, ${outVar}_result2 * ${outVar}_zeroOrOne + (1.0 - ${outVar}_zeroOrOne) * ${outVar}_result1, ${opacityVar});
+  ${outVar}_result1 = 2.0 * ${baseVar} * ${blendVar} + ${baseVar} * ${baseVar} * (1.0 - 2.0 * ${blendVar});
+  ${outVar}_result2 = sqrt(${baseVar}) * (2.0 * ${blendVar} - 1.0) + 2.0 * ${baseVar} * (1.0 - ${blendVar});
+  ${outVar}_zeroOrOne = step(0.5, ${blendVar});
+  ${outVar} = mix(${baseVar}, ${outVar}_result2 * ${outVar}_zeroOrOne + (1.0 - ${outVar}_zeroOrOne) * ${outVar}_result1, ${opacityVar});
 `;
     } else if (mode === 'Subtract') {
       mixMidVar = `${baseVar} - ${blendVar}`;
     } else if (mode === 'VividLight') {
       code = `
-  let ${outVar}_base = clamp(${baseVar}, 0.000001, 0.999999);
-  let ${outVar}_result1 = 1.0 - (1.0 - ${blendVar}) / (2.0 * ${outVar}_base);
-  let ${outVar}_result2 = ${blendVar} / (2.0 * (1.0 - ${outVar}_base));
-  let ${outVar}_zeroOrOne = step(0.5, ${blendVar});
-  let ${outVar} = mix(${outVar}_base, ${outVar}_result2 * ${outVar}_zeroOrOne + (1.0 - ${outVar}_zeroOrOne) * ${outVar}_result1, ${opacityVar});
+  ${outVar}_base = clamp(${baseVar}, 0.000001, 0.999999);
+  ${outVar}_result1 = 1.0 - (1.0 - ${blendVar}) / (2.0 * ${outVar}_base);
+  ${outVar}_result2 = ${blendVar} / (2.0 * (1.0 - ${outVar}_base));
+  ${outVar}_zeroOrOne = step(0.5, ${blendVar});
+  ${outVar} = mix(${outVar}_base, ${outVar}_result2 * ${outVar}_zeroOrOne + (1.0 - ${outVar}_zeroOrOne) * ${outVar}_result1, ${opacityVar});
 `;
     } else if (mode === 'Overwrite') {
       mixMidVar = `${blendVar}`;
@@ -156,7 +156,7 @@ export class BlendRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: code || `let ${outVar} = mix(${baseVar}, ${mixMidVar}, ${opacityVar});`,
+      code: code || `${outVar} = mix(${baseVar}, ${mixMidVar}, ${opacityVar});`,
     };
   }
 }

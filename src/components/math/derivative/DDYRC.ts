@@ -45,7 +45,7 @@ export class DDYRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = dpdy(${inVar});`,
+      code: `${outVar} = dFdy(${inVar});`,
     };
   }
 }

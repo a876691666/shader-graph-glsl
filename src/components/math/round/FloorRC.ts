@@ -45,7 +45,7 @@ export class FloorRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = floor(${inVar});`,
+      code: `${outVar} = floor(${inVar});`,
     };
   }
 }

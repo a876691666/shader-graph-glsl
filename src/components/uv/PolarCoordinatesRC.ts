@@ -59,18 +59,18 @@ export class PolarCoordinatesRC extends RC {
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2f, Center: vec2f, RadialScale: f32, LengthScale: f32) -> vec2f {
-  let delta = UV - Center;
-  let radius = length(delta) * 2.0 * RadialScale;
-  let angle = atan2(delta.x, delta.y) * 1.0 / 6.28 * LengthScale;
-  return vec2f(radius, angle);
+    const codeFn = (varName: string) => `
+vec2 ${varName}(vec2 UV, vec2 Center, float RadialScale, float LengthScale) {
+  vec2 delta = UV - Center;
+  float radius = length(delta) * 2.0 * RadialScale;
+  float angle = atan(delta.x, delta.y) * 1.0 / 6.28 * LengthScale;
+  return vec2(radius, angle);
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${radialScaleVar}, ${lengthScaleVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${radialScaleVar}, ${lengthScaleVar});`,
     };
   }
 }

@@ -45,7 +45,7 @@ export class SaturateRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = clamp(${inVar}, 0.0, 1.0);`,
+      code: `${outVar} = clamp(${inVar}, 0.0, 1.0);`,
     };
   }
 }

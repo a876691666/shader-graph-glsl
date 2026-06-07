@@ -46,7 +46,7 @@ export class SquareWaveRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = 1.0 - 2.0 * round(fract(${inVar}));`,
+      code: `${outVar} = 1.0 - 2.0 * floor(fract(${inVar}) + 0.5);`,
     };
   }
 }

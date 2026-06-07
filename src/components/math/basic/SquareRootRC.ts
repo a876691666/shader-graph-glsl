@@ -52,7 +52,7 @@ export class SquareRootRC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = pow(${aVar}, ${bVar});`,
+      code: `${outVar} = pow(${aVar}, ${bVar});`,
     };
   }
 }

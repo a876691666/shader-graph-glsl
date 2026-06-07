@@ -50,7 +50,7 @@ export class ContrastRC extends RC {
     // pow(0.5, 2.2) = 0.217637640824031
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = (${inVar} - 0.217637640824031) * ${contrastVar} + 0.217637640824031;`,
+      code: `${outVar} = (${inVar} - 0.217637640824031) * ${contrastVar} + 0.217637640824031;`,
     };
   }
 }

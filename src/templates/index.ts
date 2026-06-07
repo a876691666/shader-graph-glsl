@@ -13,4 +13,8 @@ export const SGTemplates = Object.freeze({
   subgraph: UnlitSGTemplate,
 });
 
-export const SG_VERT = 'const SG_VERT = true;\n';
+// GLSL 版本标记 — 由 MaterialTemplates 外层模板添加
+export const SG_VERT = `// -- shader-graph vertex shader --
+`;
+export const SG_FRAG = ``;
+export const GLSL_PRECISION = `precision highp float;\nprecision highp int;\n`;

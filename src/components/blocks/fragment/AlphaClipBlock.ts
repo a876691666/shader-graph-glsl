@@ -39,8 +39,8 @@ export class AlphaClipBlock extends RCBlock {
   }
 
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteAlphaClipBlock>): SGNodeOutput {
-    // 要求先link alpha 再 link alpha clip
+    // 要求先link alpha �?link alpha clip
     const inVar = compiler.getInputVarConverted(node, 'alpha');
-    return { outputs: {}, code: inVar ? `if (*alpha < ${inVar}) { discard; }` : '' };
+    return { outputs: {}, code: inVar ? `if (alpha < ${inVar}) { discard; }` : '' };
   }
 }

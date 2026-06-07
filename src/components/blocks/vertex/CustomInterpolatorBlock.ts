@@ -36,7 +36,7 @@ const nodeCfgs: ReteCustomInterpolatorBlock['meta']['nodeCfgs'] = /*@__PURE__*/ 
 export class CustomInterpolatorBlock extends RCBlock {
   static Name = 'CustomInterpolatorBlock';
   constructor() {
-    super(CustomInterpolatorBlock.Name); // 避免使用constructor name因为编译会改名
+    super(CustomInterpolatorBlock.Name); // 避免使用constructor name因为编译会改�?
     this.data.component = BlockView;
   }
 
@@ -75,12 +75,12 @@ export class CustomInterpolatorBlock extends RCBlock {
       'varyings',
       node,
       node.data.varyingValueName,
-      varName => `${varName}: vec4<f32>`,
+      varName => `vec4 ${varName}`,
     );
     const inVar = compiler.getInputVarConverted(node, 'varying');
     return {
       outputs: { varying: varyingVar },
-      code: `${varyingVar.replace('v.', '(*v).')} = ${inVar};`,
+      code: `${varyingVar} = ${inVar};`,
     };
   }
 }

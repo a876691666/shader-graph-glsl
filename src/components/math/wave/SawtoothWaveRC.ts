@@ -46,7 +46,7 @@ export class SawtoothWaveRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = 2.0 * (${inVar} - floor(0.5 + ${inVar}));`,
+      code: `${outVar} = 2.0 * (${inVar} - floor(0.5 + ${inVar}));`,
     };
   }
 }

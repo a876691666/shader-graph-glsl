@@ -50,7 +50,7 @@ export class SwizzleRC extends RC {
       const varSwizzle = compiler.getVarSwizzle(inVar, node.data.inValueType, node.data.swizzleValue);
       const typeClass = compiler.getTypeClass(node.data.outValueType);
       outVar = compiler.getOutVarName(node, 'out', 'swizzle');
-      code = `let ${outVar}: ${typeClass} = ${varSwizzle};`;
+      code = `${typeClass} ${outVar} = ${varSwizzle};`;
     }
 
     return { code, outputs: { out: outVar } };

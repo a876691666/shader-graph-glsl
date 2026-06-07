@@ -45,7 +45,7 @@ export class TangentRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = tan(${inVar});`,
+      code: `${outVar} = tan(${inVar});`,
     };
   }
 }

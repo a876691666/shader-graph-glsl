@@ -45,7 +45,7 @@ export class ArccosineRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = acos(${inVar});`,
+      code: `${outVar} = acos(${inVar});`,
     };
   }
 }

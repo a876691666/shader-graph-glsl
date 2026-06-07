@@ -51,7 +51,7 @@ export class DistanceRC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = distance(${aVar}, ${bVar});`,
+      code: `${outVar} = distance(${aVar}, ${bVar});`,
     };
   }
 }

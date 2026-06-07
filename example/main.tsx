@@ -110,9 +110,7 @@ function App() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if ('gpu' in navigator === false) {
-      alert('请使用Chrome Beta 113以上版本, 且打开WebGPU');
-    }
+    console.log('Shader Graph GLSL — WebGL2 渲染模式');
   }, []);
 
   return (

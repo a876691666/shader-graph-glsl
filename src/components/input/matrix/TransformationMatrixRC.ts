@@ -58,7 +58,7 @@ export class TransformationMatrixRC extends RC {
 
   static initMatrixContext(compiler: ShaderGraphCompiler, type: TypeValue) {
     const node = { name: 'Matrix', data: {} } as any;
-    return compiler.setContext('uniforms', node, type, varName => `${varName}: mat4x4<f32>`);
+    return compiler.setContext('uniforms', node, type, varName => `mat4 ${varName}`);
   }
 
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteTransformationMatrixNode>): SGNodeOutput {

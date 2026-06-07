@@ -40,6 +40,6 @@ export class NormalBlock extends RCBlock {
 
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteNormalBlock>): SGNodeOutput {
     const inVar = compiler.getInputVarConverted(node, 'normal', false);
-    return { outputs: {}, code: inVar ? `*normalOS = ${inVar};` : '' };
+    return { outputs: {}, code: inVar ? `normalOS = ${inVar};` : '' };
   }
 }

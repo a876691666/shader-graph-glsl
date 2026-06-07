@@ -61,20 +61,20 @@ export class NormalBlendRC extends RC {
     if (mode === 'default') {
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = normalize(vec3f(${aVar}.rg + ${bVar}.rg, ${aVar}.b * ${bVar}.b));`,
+        code: `${outVar} = normalize(vec3(${aVar}.rg + ${bVar}.rg, ${aVar}.b * ${bVar}.b));`,
       };
     } else {
-      const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(A: vec3f, B: vec3f) -> vec3f {
-  let t = A.xyz + vec3f(0.0, 0.0, 1.0);
-  let u = B.xyz * vec3f(-1.0, -1.0, 1.0);
+      const codeFn = (varName: string) => `
+vec3 ${varName}(vec3 A, vec3 B) {
+  vec3 t = A.xyz + vec3(0.0, 0.0, 1.0);
+  vec3 u = B.xyz * vec3(-1.0, -1.0, 1.0);
   return (t / t.z) * dot(t, u) - u;
 }`;
       const fnVar = compiler.setContext('defines', node, mode, codeFn);
 
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = ${fnVar}(${aVar}, ${bVar});`,
+        code: `${outVar} = ${fnVar}(${aVar}, ${bVar});`,
       };
     }
   }

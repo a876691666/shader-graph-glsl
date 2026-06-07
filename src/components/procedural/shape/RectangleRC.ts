@@ -56,9 +56,9 @@ export class RectangleRC extends RC {
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2<f32>, Width: f32, Height: f32) -> f32 {
-  var d = abs(UV * 2. - 1.) - vec2<f32>(Width, Height);
+    const codeFn = (varName: string) => `
+float ${varName}(vec2 UV, float Width, float Height) {
+  vec2 d = abs(UV * 2. - 1.) - vec2(Width, Height);
   d = 1.0 - d / fwidth(d);
   return clamp(min(d.x, d.y), 0.0, 1.0);
 }`;
@@ -66,7 +66,7 @@ fn ${varName}(UV: vec2<f32>, Width: f32, Height: f32) -> f32 {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar});`,
     };
   }
 }

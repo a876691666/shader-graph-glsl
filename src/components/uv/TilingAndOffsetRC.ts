@@ -74,7 +74,7 @@ export class TilingAndOffsetRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${uvVar} * ${tilingVar} + ${offsetVar};`,
+      code: `${outVar} = ${uvVar} * ${tilingVar} + ${offsetVar};`,
     };
   }
 }

@@ -58,7 +58,7 @@ export class InverseLerpRC extends RC {
     const tVar = compiler.getInputVarConverted(node, 't');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = (${tVar} - ${aVar}) / (${bVar} - ${aVar});`,
+      code: `${outVar} = (${tVar} - ${aVar}) / (${bVar} - ${aVar});`,
     };
   }
 }

@@ -53,16 +53,16 @@ export class HueRC extends RC {
     const outVar = compiler.getOutVarName(node, 'out', 'hue');
     const [offsetVar, inVar] = compiler.getInputVarConvertedArray(node, ['offset', 'in']);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>, Offset: f32) -> vec3<f32> {
-  let K = vec4<f32>(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-  let P = mix(vec4<f32>(In.bg, K.wz), vec4<f32>(In.gb, K.xy), step(In.b, In.g));
-  let Q = mix(vec4<f32>(P.xyw, In.r), vec4<f32>(In.r, P.yzx), step(P.x, In.r));
-  let D = Q.x - min(Q.w, Q.y);
-  let E = 1e-10;
-  var hsv = vec3<f32>(abs(Q.z + (Q.w - Q.y)/(6.0 * D + E)), D / (Q.x + E), Q.x);
+    const codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In, float Offset) {
+  vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+  vec4 P = mix(vec4(In.bg, K.wz), vec4(In.gb, K.xy), step(In.b, In.g));
+  vec4 Q = mix(vec4(P.xyw, In.r), vec4(In.r, P.yzx), step(P.x, In.r));
+  float D = Q.x - min(Q.w, Q.y);
+  float E = 1e-10;
+  vec3 hsv = vec3(abs(Q.z + (Q.w - Q.y)/(6.0 * D + E)), D / (Q.x + E), Q.x);
 
-  let hue = hsv.x + ${node.data.rangeValue === 'degrees' ? 'Offset / 360.0' : 'Offset'};
+  float hue = hsv.x + ${node.data.rangeValue === 'degrees' ? 'Offset / 360.0' : 'Offset'};
   if (hue < 0.) {
     hsv.x = hue + 1.;
   } else if (hue > 1.) {
@@ -70,22 +70,17 @@ fn ${varName}(In: vec3<f32>, Offset: f32) -> vec3<f32> {
   } else {
     hsv.x = hue;
   }
-  // hsv.x = (hue < 0.)
-  //         ? hue + 1.
-  //         : (hue > 1.)
-  //             ? hue - 1.
-  //             : hue;
 
   // HSV to RGB
-  let K2 = vec4<f32>(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-  let P2 = abs(fract(hsv.xxx + K2.xyz) * 6.0 - K2.www);
-  return hsv.z * mix(K2.xxx, clamp(P2 - K2.xxx, vec3f(0.0), vec3f(1.0)), hsv.y);
+  vec4 K2 = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 P2 = abs(fract(hsv.xxx + K2.xyz) * 6.0 - K2.www);
+  return hsv.z * mix(K2.xxx, clamp(P2 - K2.xxx, vec3(0.0), vec3(1.0)), hsv.y);
 }`;
     const fnVar = compiler.setContext('defines', node, node.data.rangeValue, codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${inVar}, ${offsetVar});`,
+      code: `${outVar} = ${fnVar}(${inVar}, ${offsetVar});`,
     };
   }
 }

@@ -45,7 +45,7 @@ export class CosineRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = cos(${inVar});`,
+      code: `${outVar} = cos(${inVar});`,
     };
   }
 }

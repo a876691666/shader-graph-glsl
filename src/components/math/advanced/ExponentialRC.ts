@@ -45,7 +45,7 @@ export class ExponentialRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = exp(${inVar});`,
+      code: `${outVar} = exp(${inVar});`,
     };
   }
 }

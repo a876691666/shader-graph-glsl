@@ -55,7 +55,7 @@ export class ChannelMixerRC extends RC {
     const [rVar, gVar, bVar, inVar] = compiler.getInputVarConvertedArray(node, ['r', 'g', 'b', 'in']);
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = vec3<f32>(dot(${inVar}, ${rVar}), dot(${inVar}, ${gVar}), dot(${inVar}, ${bVar}));`,
+      code: `${outVar} = vec3(dot(${inVar}, ${rVar}), dot(${inVar}, ${gVar}), dot(${inVar}, ${bVar}));`,
     };
   }
 }

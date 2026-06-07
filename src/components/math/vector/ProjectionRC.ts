@@ -52,12 +52,12 @@ export class ProjectionRC extends RC {
     if (node.data.aValueType === ValueType.float) {
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = ${bVar} * ${aVar} * ${bVar} / (${bVar} * ${bVar});`,
+        code: `${outVar} = ${bVar} * ${aVar} * ${bVar} / (${bVar} * ${bVar});`,
       };
     }
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${bVar} * dot(${aVar}, ${bVar}) / dot(${bVar}, ${bVar});`,
+      code: `${outVar} = ${bVar} * dot(${aVar}, ${bVar}) / dot(${bVar}, ${bVar});`,
     };
   }
 }

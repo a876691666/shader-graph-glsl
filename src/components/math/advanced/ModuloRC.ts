@@ -51,7 +51,7 @@ export class ModuloRC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${aVar} % ${bVar};`,
+      code: `${outVar} = mod(${aVar}, ${bVar});`,
     };
   }
 }

@@ -76,31 +76,31 @@ export class SceneDepthRC extends RC {
       'bindings',
       node,
       'depthTexture',
-      (varName, i) => `@group(0) @binding(${i}) var ${varName}: texture_depth_2d;`,
+      (varName, i) => `uniform sampler2D ${varName};`,
     );
     const zBufferParamVar = compiler.setContext(
       'uniforms',
       node,
       'zBufferParam',
-      (varName: string) => `${varName}: vec4<f32>`,
+      (varName: string) => `vec4 ${varName}`,
     );
 
     if (mode === 'raw') {
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = textureSample(${depthTextureVar}, ${samplerVar}, ${uvVar}.xy);`,
+        code: `${outVar} = texture(${depthTextureVar}, ${uvVar}.xy).r;`,
       };
     }
 
     let codeFn: (n: string) => string;
     if (mode === 'linear01') {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(depth: f32, zBufferParam: vec4f) -> f32 {
+      codeFn = (varName: string) => `
+float ${varName}(float depth, vec4 zBufferParam) {
   return 1.0 / (zBufferParam.x * depth + zBufferParam.y);
 }`;
     } else {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(depth: f32, zBufferParam: vec4f) -> f32 {
+      codeFn = (varName: string) => `
+float ${varName}(float depth, vec4 zBufferParam) {
   return 1.0 / (zBufferParam.z * depth + zBufferParam.w);
 }`;
     }
@@ -109,7 +109,7 @@ fn ${varName}(depth: f32, zBufferParam: vec4f) -> f32 {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(textureSample(${depthTextureVar}, ${samplerVar}, ${uvVar}.xy), ${zBufferParamVar});`,
+      code: `${outVar} = ${fnVar}(texture(${depthTextureVar}, ${uvVar}.xy).r, ${zBufferParamVar});`,
     };
   }
 }

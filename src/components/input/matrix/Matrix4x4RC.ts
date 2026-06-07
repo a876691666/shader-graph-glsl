@@ -40,6 +40,6 @@ export class Matrix4x4RC extends RC {
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteMatrix4x4Node>): SGNodeOutput {
     const outVar = compiler.getOutVarName(node, 'out', 'mat4');
     const values = node.data.outValue.map(Number).join(', ');
-    return { outputs: { out: outVar }, code: `let ${outVar} = mat4x4<f32>(${values});` };
+    return { outputs: { out: outVar }, code: `${outVar} = mat4(${values});` };
   }
 }

@@ -57,8 +57,8 @@ export class TangentVectorRC extends RC {
         varName: 'tangentOS',
         code: ``,
       });
-      const varyingVar = compiler.setContext('varyings', node, key, varName => `${varName}: vec4f`);
-      const fragVar = compiler.setContext('fragShared', node, key, varName => `let ${varName} = normalize(${varyingVar}.xyz);`);
+      const varyingVar = compiler.setContext('varyings', node, key, varName => `vec4 ${varName}`);
+      const fragVar = compiler.setContext('fragShared', node, key, varName => `${varName} = normalize(${varyingVar}.xyz);`);
       const defVar = compiler.setVarNameMap(node, key + '_def', vertVar, fragVar);
       compiler.setAutoVaryings(node, key, varyingVar, vertVar);
       return defVar;
@@ -66,10 +66,10 @@ export class TangentVectorRC extends RC {
       let code: string;
       const tangentOS = TangentVectorRC.initTangentVectorContext(compiler, 'object');
       const matrix = Mat(space === 'view' ? 'ModelView' : 'Model');
-      code = `let ${vertVar} = mat3x3f(${matrix}[0].xyz, ${matrix}[1].xyz, ${matrix}[2].xyz) * ${tangentOS}.xyz;`;
+      code = `${vertVar} = mat3(${matrix}[0].xyz, ${matrix}[1].xyz, ${matrix}[2].xyz) * ${tangentOS}.xyz;`;
       compiler.setContext('vertShared', node, key, { varName: vertVar, code });
-      const varyingVar = compiler.setContext('varyings', node, key, varName => `${varName}: vec3f`);
-      const fragVar = compiler.setContext('fragShared', node, key, varName => `let ${varName} = normalize(${varyingVar});`);
+      const varyingVar = compiler.setContext('varyings', node, key, varName => `vec3 ${varName}`);
+      const fragVar = compiler.setContext('fragShared', node, key, varName => `${varName} = normalize(${varyingVar});`);
       const defVar = compiler.setVarNameMap(node, key + '_def', vertVar, fragVar);
       compiler.setAutoVaryings(node, key, varyingVar, vertVar);
       return defVar;

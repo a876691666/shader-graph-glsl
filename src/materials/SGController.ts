@@ -28,10 +28,28 @@ import {
 } from 'three';
 import { Texture, RawShaderMaterial, DepthModes, Matrix4, Vector3 } from 'three';
 import type { Resource, BindingMap, SGCompilation, UniformMap } from '../compilers';
+import { disposeTexture } from './dispose';
 import { MaterialTemplates } from '../templates';
 import { ResourceAdapter } from './ResourceAdapter';
 import type { AssetValue, MaybePromise, ValueType } from '../types';
-import { WebGPURenderer, disposeTexture } from './WebGPURenderer';
+
+/** GLSL 类型 → Three.js uniform type */
+const glslToThreeUniformType = (glslType: string): string => {
+  switch (glslType) {
+    case 'float': return 'f';
+    case 'int': return 'i';
+    case 'bool': return 'b';
+    case 'vec2': return 'v2';
+    case 'vec3': return 'v3';
+    case 'vec4': return 'v4';
+    case 'mat2': return 'm2';
+    case 'mat3': return 'm3';
+    case 'mat4': return 'm4';
+    case 'sampler2D':
+    case 'sampler2DShadow': return 't';
+    default: return glslType;
+  }
+};
 
 const I_Model = new Matrix4();
 const IT_ModelView = new Matrix4();
@@ -102,10 +120,10 @@ type SetParams = {
     [k in 'orthographic' | 'nearPlane' | 'farPlane' | 'zBufferSign' | 'width' | 'height']: number;
   };
   SceneDepth: {
-    depthTexture: Texture | GPUTextureView | undefined;
+    depthTexture: Texture | undefined;
     zBufferParam: Vector4 | undefined;
   };
-  SceneColor: { colorTexture: Texture | GPUTextureView | undefined };
+  SceneColor: { colorTexture: Texture | undefined };
 };
 
 export class SGController {
@@ -151,27 +169,30 @@ export class SGController {
       let value = undefined;
       if (nodeName === 'Parameter') value = await parseParameterValue(name);
       else if (nodeName === 'Time') value = 0;
-      // else if (nodeName === 'TexelSize') value = new Vector2();
       else if (nodeName === 'TransformationMatrix') value = new Matrix4();
 
       const unifromKey = compilation.uniformMap[contextKey];
-      const type = unifromKey.type.replace('<', '_').replace('>', '') as any;
+      // GLSL type → Three.js uniform type
+      const type = glslToThreeUniformType(unifromKey.type);
       material.uniforms[unifromKey.name] = { value, type };
     });
 
     Object.keys(compilation.bindingMap).forEach(contextKey => {
       const binding = compilation.bindingMap[contextKey];
       if (!material.uniforms[binding.name] && !compilation.resource.texture[contextKey]) {
-        material.uniforms[binding.name] = { value: null, type: binding.type as any };
+        const type = glslToThreeUniformType(binding.type);
+        material.uniforms[binding.name] = { value: null, type };
       }
     });
 
     // init resource
     const resourcePromises = Object.keys(compilation.resource.texture).map(async contextKey => {
       const asset = compilation.resource.texture[contextKey];
-      if (!material.uniforms[contextKey])
-        material.uniforms[contextKey] = { value: undefined, type: 'texture2d_f32' };
-      material.uniforms[contextKey].value = await loadTexture(asset);
+      // 使用 bindingMap 中的变量名作为 uniform 键名，与 GLSL shader 中声明的名字一致
+      const uniformName = compilation.bindingMap[contextKey]?.name || contextKey;
+      if (!material.uniforms[uniformName])
+        material.uniforms[uniformName] = { value: undefined, type: 't' };
+      material.uniforms[uniformName].value = await loadTexture(asset);
     });
 
     await Promise.all([...resourcePromises, ...uniformPromises]);
@@ -255,11 +276,12 @@ export class SGController {
   updateMatrix(
     object: Object3D,
     camera: PerspectiveCamera | OrthographicCamera,
-    renderer: WebGPURenderer,
+    viewport: [number, number, number, number],
+    opaquePass?: { depthView?: any; colorView?: any },
   ): void {
-    if (this.material.transparent) {
-      this.set('SceneDepth', 'depthTexture', renderer.opaquePass.depthView);
-      this.set('SceneColor', 'colorTexture', renderer.opaquePass.colorView);
+    if (this.material.transparent && opaquePass) {
+      this.set('SceneDepth', 'depthTexture', opaquePass.depthView);
+      this.set('SceneColor', 'colorTexture', opaquePass.colorView);
     }
     // FIXME 结果还是不太对...但是换了矩阵的推导结果和unity的是一样的...
     const { near: n, far: f } = camera;
@@ -306,8 +328,8 @@ export class SGController {
     } else {
       this.set('Camera', 'orthographic', 0);
     }
-    this.set('Screen', 'width', renderer.viewport[2]);
-    this.set('Screen', 'height', renderer.viewport[3]);
+    this.set('Screen', 'width', viewport[2]);
+    this.set('Screen', 'height', viewport[3]);
   }
 
   static loadTexture(asset: AssetValue) {

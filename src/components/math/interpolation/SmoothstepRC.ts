@@ -57,7 +57,7 @@ export class SmoothstepRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = smoothstep(${edge1Var}, ${edge2Var}, ${inVar});`,
+      code: `${outVar} = smoothstep(${edge1Var}, ${edge2Var}, ${inVar});`,
     };
   }
 }

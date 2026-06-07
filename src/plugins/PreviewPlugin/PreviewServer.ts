@@ -15,13 +15,15 @@ import {
   RawShaderMaterial,
   Scene,
   SphereGeometry,
+  WebGLRenderer,
+  Color,
 } from 'three';
 import { PreviewClient } from './PreviewClient';
 import { ShaderGraphEditor } from '../../editors';
 import { Rete } from '../../types';
 // @ts-ignore 修复旋转上下翻转
 import { OrbitControls } from './OrbitControls';
-import { SGController, WebGPUMaterial, WebGPURenderer, disposeGeometry } from '../../materials';
+import { SGController, disposeGeometry, disposeMaterial } from '../../materials';
 import { FloorShader } from './floorShader';
 
 const scaleFactor = 1 / 15;
@@ -48,14 +50,14 @@ export class PreviewServer {
 
   geometry3D: BufferGeometry;
   geometry2D: PlaneGeometry;
-  renderer: WebGPURenderer;
-  mainMaterial: WebGPUMaterial;
+  renderer: WebGLRenderer;
+  mainMaterial: RawShaderMaterial & { sg: SGController };
   disposed = false;
-  floor: Mesh<BoxGeometry, WebGPUMaterial>;
+  floor: Mesh<BoxGeometry, RawShaderMaterial & { sg: SGController }>;
   updatingMaterial = false;
   updatingMaterialNext = false;
   resizeObserver: ResizeObserver;
-  ctx: GPUCanvasContext;
+  ctx!: WebGL2RenderingContext;
   dpr = devicePixelRatio;
 
   constructor(public editor: ShaderGraphEditor) {
@@ -64,8 +66,29 @@ export class PreviewServer {
     this.clock = new Clock();
     Object.values(this.geometries).forEach(geo => geo.center());
 
-    this.renderer = new WebGPURenderer();
-    this.mainMaterial = new WebGPUMaterial();
+    // 使用 Three.js WebGLRenderer（自动获取 WebGL2 上下文）
+    this.renderer = new WebGLRenderer({
+      canvas: this.canvas,
+      alpha: true,
+      premultipliedAlpha: false,
+      antialias: true,
+    });
+    this.ctx = this.renderer.getContext() as any;
+    this.renderer.setClearColor(new Color(0, 0, 0, 0), 0);
+    this.renderer.autoClear = false;
+
+    this.mainMaterial = new RawShaderMaterial() as any;
+    this.mainMaterial.sg = new SGController(this.mainMaterial);
+    // 设置默认有效 shader，避免首次渲染时报错
+    this.mainMaterial.vertexShader = `#version 300 es
+      layout(location = 0) in vec3 position;
+      uniform mat4 projectionMatrix;
+      uniform mat4 modelViewMatrix;
+      void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+    this.mainMaterial.fragmentShader = `#version 300 es
+      precision highp float;
+      layout(location = 0) out vec4 fragColor;
+      void main() { fragColor = vec4(0.0, 0.0, 0.0, 0.0); }`;
     this.geometry3D = this.geometries.Sphere;
     this.geometry2D = new PlaneGeometry(2, 2);
 
@@ -80,23 +103,23 @@ export class PreviewServer {
     this.camera3D.add(ambientLight, dirLight);
     this.scene.add(this.camera2D, this.camera3D);
 
-    const floorMaterial = new WebGPUMaterial();
+    const floorMaterial = new RawShaderMaterial() as any;
+    floorMaterial.sg = new SGController(floorMaterial);
     this.floor = new Mesh(new BoxGeometry(40 * scaleFactor, 2 * scaleFactor, 40 * scaleFactor), floorMaterial);
     floorMaterial.uniforms = {
-      modelViewMatrix: { value: new Matrix4(), type: 'mat4x4_f32' },
-      projectionMatrix: { value: new Matrix4(), type: 'mat4x4_f32' },
+      modelViewMatrix: { value: new Matrix4(), type: 'm4' },
+      projectionMatrix: { value: new Matrix4(), type: 'm4' },
     };
     floorMaterial.vertexShader = FloorShader.vert;
     floorMaterial.fragmentShader = FloorShader.frag;
     floorMaterial.sg.uniformMap = {
-      modelViewMatrix: { name: 'modelViewMatrix', type: 'mat4x4<f32>' },
-      projectionMatrix: { name: 'projectionMatrix', type: 'mat4x4<f32>' },
+      modelViewMatrix: { name: 'modelViewMatrix', type: 'mat4' },
+      projectionMatrix: { name: 'projectionMatrix', type: 'mat4' },
     };
-    this.floor.position.y = 12 * scaleFactor;
+    this.floor.position.y = -14 * scaleFactor;
     this.floor.updateMatrixWorld(true);
     this.scene.add(this.floor);
 
-    this.ctx = this.canvas.getContext('webgpu')!;
     this.canvas.classList.add('sg-preview-server-canvas');
     this.editor.view.container.appendChild(this.canvas);
 
@@ -104,12 +127,13 @@ export class PreviewServer {
     this.resizeObserver = new ResizeObserver(() => {
       this.canvas.width = this.canvas.clientWidth * this.dpr;
       this.canvas.height = this.canvas.clientHeight * this.dpr;
+      this.renderer.setPixelRatio(this.dpr);
+      this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
     });
-    this.renderer.clearValue.a = 0;
-    this.renderer.clearColor = false;
     this.resizeObserver.observe(this.canvas);
 
-    this.renderer.init().then(this.render);
+    // 直接启动渲染，无需异步 init
+    this.render();
   }
 
   updateGeometry3D(geometryName: string) {
@@ -137,16 +161,16 @@ export class PreviewServer {
     if (this.disposed) return;
     const deltaTime = this.clock.getDelta();
     this.mainMaterial.sg.update(deltaTime);
+    this.control?.update();
 
-    // clear canvas with alpha 0
+    // 清除画布 (透明背景)
     const { width, height } = this.canvas;
-    this.renderer.setViewport(0, 0, width, height);
     this.renderer.setScissor(0, 0, width, height);
-    this.renderer.clear(this.ctx);
+    this.renderer.setViewport(0, 0, width, height);
+    this.renderer.clear(true, true, false);
 
     if (!this.updatingMaterial) [...this.clients.values()].sort((a, b) => a.weight - b.weight).forEach(this.renderClient);
     requestAnimationFrame(this.render);
-    // setTimeout(this.render, 500);
   };
 
   updateFloor() {
@@ -159,9 +183,9 @@ export class PreviewServer {
 
   updateMaterialUnifroms(camera: PerspectiveCamera | OrthographicCamera) {
     const { mesh, mainMaterial } = this;
-    camera.updateMatrixWorld(); // 需要使用最新的算 否则出现抖动
+    camera.updateMatrixWorld();
     mesh.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, mesh.matrixWorld);
-    mainMaterial.sg.updateMatrix(mesh, camera, this.renderer);
+    mainMaterial.sg.updateMatrix(mesh, camera, [0, 0, this.canvas.width, this.canvas.height]);
   }
 
   async checkNodeChange() {
@@ -216,9 +240,8 @@ export class PreviewServer {
   renderClient = (client: PreviewClient) => {
     if (client.enable) {
       const floorVisible = this.floor.visible;
-      this.mesh.material = client.node ? client.material : this.mainMaterial;
+      this.mesh.material = client.node ? client.material as any : this.mainMaterial;
       this.mesh.geometry = client.type === '2d' ? this.geometry2D : this.geometry3D;
-      this.renderer.opaquePass.enabled = !client.node;
       const camera = client.type === '2d' ? this.camera2D : this.camera3D;
       if (client.node) this.floor.visible = false;
       client.updateCamera(this.camera3D);
@@ -228,10 +251,13 @@ export class PreviewServer {
       const { top: py, left: px } = this.editor.view.container.getBoundingClientRect();
       const { width, height, top: cy, left: cx } = client.canvas.getBoundingClientRect();
       const x = cx - px;
-      const y = cy - py;
-      this.renderer.setScissor(x * this.dpr, y * this.dpr, Math.round(width * this.dpr), Math.round(height * this.dpr));
-      this.renderer.setViewport(x * this.dpr, y * this.dpr, Math.round(width * this.dpr), Math.round(height * this.dpr));
-      this.renderer.render(this.scene, camera, this.ctx);
+      // DOM坐标原点在左上，WebGL framebuffer 原点在左下，需要翻转Y
+      const y = this.canvas.height / this.dpr - (cy - py) - height;
+      const w = Math.round(width * this.dpr);
+      const h = Math.round(height * this.dpr);
+      this.renderer.setScissor(x * this.dpr, y * this.dpr, w, h);
+      this.renderer.setViewport(x * this.dpr, y * this.dpr, w, h);
+      this.renderer.render(this.scene, camera);
       if (client.node) this.floor.visible = floorVisible;
     }
   };

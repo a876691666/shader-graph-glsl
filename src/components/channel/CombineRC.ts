@@ -73,7 +73,7 @@ export class CombineRC extends RC {
       const outVar = compiler.getOutVarName(node, key, key);
       const outType = compiler.getTypeClass(node.data[key + 'ValueType']);
       codes.push(
-        `let ${outVar} = ${outType}(${key
+        `${outVar} = ${outType}(${key
           .split('')
           .map(i => inputs[i])
           .join(', ')});`,

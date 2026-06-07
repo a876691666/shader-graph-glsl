@@ -73,7 +73,7 @@ export class TransformRC extends RC {
     const Mat = (type: Parameters<typeof TransformationMatrixRC.initMatrixContext>['1']) =>
       TransformationMatrixRC.initMatrixContext(compiler, type);
     const w = node.data.typeValue === 'position' ? '1.0' : '0.0';
-    const vec4Var = `vec4<f32>(${inVar}, ${w})`;
+    const vec4Var = `vec4(${inVar}, ${w})`;
     const { TBN, TBN_IT, TBN_IT_sgn } = initTBNContext(compiler, 'world')!;
 
     let varCode = `${typeClass}(0)`;
@@ -85,7 +85,7 @@ export class TransformRC extends RC {
     }
     if (combine === 'object_to_tangent') {
       const model = Mat('Model');
-      varCode = `normalize(${TBN_IT_sgn} * (${TBN_IT} * (mat3x3f(${model}[0].xyz, ${model}[1].xyz, ${model}[2].xyz) * ${vec4Var}.xyz)))`;
+      varCode = `normalize(${TBN_IT_sgn} * (${TBN_IT} * (mat3(${model}[0].xyz, ${model}[1].xyz, ${model}[2].xyz) * ${vec4Var}.xyz)))`;
     }
 
     if (combine === 'world_to_object') {
@@ -120,7 +120,7 @@ export class TransformRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = (${varCode}).xyz;`,
+      code: `${outVar} = (${varCode}).xyz;`,
     };
   }
 }

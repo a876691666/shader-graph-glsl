@@ -14,7 +14,7 @@ import {
 } from '../components';
 import { RC } from '../components/ReteComponent';
 import { ShaderGraphData, SGNodeData, SGNodes, SubGraphProvider } from '../editors';
-import { SGTemplates, SG_VERT } from '../templates';
+import { SGTemplates, SG_VERT, SG_FRAG } from '../templates';
 import {
   ValueType,
   ReteNode,
@@ -47,6 +47,7 @@ import {
   UniformMap,
   BindingMap,
 } from './ShaderGraphTypes';
+import { getGLSLType, GLSL_CTOR_PREFIX, applyGLSLBuiltinMap } from './ShaderDialect';
 
 /**
  * 编译顺序
@@ -87,11 +88,11 @@ export class ShaderGraphCompiler extends GraphCompiler {
     if (node.data.outValueType === ValueType.texture2d) {
       return this.compileValue(node.data.outValue, node.data.outValueType);
     }
-    const uniformVar = this.setContext('uniforms', node, node.data.outValueName, varName => `${varName}: ${this.getTypeClass(node.data.outValueType)}`);
+    const uniformVar = this.setContext('uniforms', node, node.data.outValueName, varName => `${this.getTypeClass(node.data.outValueType)} ${varName}`);
     if (node.data.outValueUsage === ValueUsage.Color) {
       // 目前实际输入的是sRGB, 后面再同步接入最新three的颜色空间管理
       const SRGBToLinear = ColorSpaceConversionRC.initFnContext(this, 'sRGB', 'Linear');
-      const codeFn = (varName: string) => /* wgsl */ `let ${varName} = ${SRGBToLinear}(${uniformVar});`;
+      const codeFn = (varName: string) => `${this.getTypeClass(node.data.outValueType)} ${varName} = ${SRGBToLinear}(${uniformVar});`;
       const fragVar = this.setContext('fragShared', node, node.data.outValueName, codeFn);
       const vertVar = this.setContext('vertShared', node, node.data.outValueName, codeFn);
       return this.setVarNameMap(node, node.data.outValueName, vertVar, fragVar);
@@ -115,12 +116,10 @@ export class ShaderGraphCompiler extends GraphCompiler {
   }
 
   setAutoVaryings(node: NodeName, key: string, varyingVar: string, vertVar: string) {
-    if (['positionOS', 'normalOS', 'tangentOS'].includes(vertVar)) {
-      vertVar = `*${vertVar}`;
-    }
+    // GLSL 中 varying 直接赋值, 不需要解引用
     return this.setContext('autoVaryings', node, key, {
       varName: varyingVar,
-      code: `${varyingVar.replace('v.', '(*v).')} = ${vertVar};`,
+      code: `${varyingVar} = ${vertVar};`,
     });
   }
 
@@ -134,8 +133,7 @@ export class ShaderGraphCompiler extends GraphCompiler {
         let varName = this.getContextVarName(node, key);
         const index = Object.keys(this.context[type as ContextKeys]).length + 1;
         const code = itemOrCode(varName, index);
-        if (type === 'uniforms') varName = 'u.' + varName;
-        if (type === 'varyings') varName = 'v.' + varName;
+        // GLSL 1.00: uniform/varying 是独立变量，不使用 u./v. 前缀
         this.context[type as ContextKeys][contextKey] = { varName, code, index };
       } else {
         this.context[type as ContextKeys][contextKey] = itemOrCode;
@@ -153,7 +151,34 @@ export class ShaderGraphCompiler extends GraphCompiler {
   }
 
   getCode(nodeId: number): string {
-    return this.nodesCompilation.get(nodeId)?.code || '';
+    const output = this.nodesCompilation.get(nodeId);
+    if (!output || !output.code) return '';
+    let code = output.code;
+    code = this.fixCodeDecl(code, nodeId);
+    if (code !== output.code) output.code = code;
+    return code;
+  }
+
+  /** 为裸露赋值添加 GLSL 类型声明 */
+  private fixCodeDecl(code: string, nodeId: number): string {
+    const trimmed = code.trim();
+    if (!trimmed || !trimmed.includes('=')) return code;
+    // 跳过已有类型声明、控制语句等
+    if (/^(float|int|uint|vec[234]|mat[234]|bool|void|if|for|return|discard|\/\/|\/\*|#|layout)\b/.test(trimmed)) return code;
+    const node = this.graphData.nodes[nodeId];
+    if (!node) return code;
+    // 根据变量名匹配输出 key，而非使用第一个输出
+    const varName = trimmed.split('=')[0].trim();
+    const matchedKey = Object.keys(node.outputs).find(key => varName.startsWith(key));
+    const firstKey = matchedKey || Object.keys(node.outputs)[0];
+    if (!firstKey) return code;
+    const outType = node.data[firstKey + 'ValueType'] as ValueType;
+    if (!outType) return code;
+    const tc = this.getTypeClass(outType);
+    if (!tc) return code;
+    // 保持原有缩进
+    const indent = code.match(/^(\s*)/)?.[1] || '';
+    return `${indent}${tc} ${applyGLSLBuiltinMap(trimmed)}`;
   }
 
   collectNodeInputCode(nodeId: number, output: string[] = [], self = false): string[] {
@@ -267,18 +292,7 @@ export class ShaderGraphCompiler extends GraphCompiler {
   }
 
   getTypeClass(type: ValueType) {
-    // prettier-ignore
-    switch (type) {
-      case ValueType.texture2d: return 'texture_2d<f32>';
-      case ValueType.float: return 'f32';
-      case ValueType.vec2: return 'vec2<f32>';
-      case ValueType.vec3: return 'vec3<f32>';
-      case ValueType.vec4: return 'vec4<f32>';
-      case ValueType.mat2: return 'mat2x2<f32>';
-      case ValueType.mat3: return 'mat3x3<f32>';
-      case ValueType.mat4: return 'mat4x4<f32>';
-      default: return type;
-    }
+    return getGLSLType(type);
   }
 
   getOutVarName(node: Pick<SGNodeData<SGNodes>, 'data' | 'name'>, key: string, name?: string) {
@@ -306,13 +320,14 @@ export class ShaderGraphCompiler extends GraphCompiler {
       case ValueType.mat2:
       case ValueType.mat3:
       case ValueType.mat4:
-        return `${type}x${parseInt(type, 10)}<f32>(${value.map(Number).join(', ')})`;
+        return `${GLSL_CTOR_PREFIX[type]}(${value.map(Number).join(', ')})`;
       case ValueType.texture2d: {
         const asset = value as AssetValue;
         if (!asset) return '';
         const key = hash(asset.id);
         const node = { data: {}, name: 'Texture2D' } as any;
-        const outVar = this.setContext('bindings', node, key, (varName, i) => `@group(0) @binding(${i}) var ${varName}: texture_2d<f32>;`);
+        // GLSL: uniform sampler2D name;
+        const outVar = this.setContext('bindings', node, key, (varName, i) => `uniform sampler2D ${varName};`);
         this.setResource('texture', node, key, value);
         return outVar;
       }
@@ -320,7 +335,8 @@ export class ShaderGraphCompiler extends GraphCompiler {
         const sampler = (value || { filter: 'point', warp: 'clamp' }) as SamplerValue;
         const key = sampler.filter + '_' + sampler.warp;
         const node = { data: {}, name: 'Sampler' } as any;
-        const outVar = this.setContext('bindings', node, key, (varName, i) => `@group(0) @binding(${i}) var ${varName}: sampler;`);
+        // GLSL: sampler 与 texture 合并为 sampler2D, 此处仅记录资源
+        const outVar = this.setContext('bindings', node, key, (varName, i) => `// sampler state: ${sampler.filter}_${sampler.warp}`);
         this.setResource('sampler', node, key, sampler);
         return outVar;
       }
@@ -344,25 +360,38 @@ export class ShaderGraphCompiler extends GraphCompiler {
 
     HeadContextItems.filter(i => !exclude.includes(i)).forEach(key => {
       let code = '';
-      // to js object order
       const items = Object.keys(this.context[key])
         .sort()
         .map(i => this.context[key][i]);
       if (key === 'uniforms') {
-        code = [
-          'struct Uniform {',
-          ...items
-            // .filter(i => testCode.includes(i.varName.replace('u.', '')))
-            .map(i => `  ${i.code},`),
-          '};',
-        ].join('\n');
+        // GLSL: 独立的 uniform 声明 (跳过模板内置的 matrix uniforms)
+        const builtinUniforms = ['sg_Matrix_ModelView', 'sg_Matrix_Proj'];
+        const usedItems = items
+          .filter(i => testCode.includes(i.varName))
+          .filter(i => !builtinUniforms.includes(i.varName));
+        code = usedItems
+          .map(i => `uniform ${i.code};`)
+          .join('\n');
       } else if (key === 'varyings') {
+        // GLSL ES 3.00: out in vert, in in frag
+        const prefix = scope === 'vert' ? 'out' : 'in';
+        const filteredItems = items.filter(i => testCode.includes(i.varName));
         code = [
-          'struct Varying {',
-          '  @builtin(position) position: vec4<f32>,',
-          ...items.filter(i => testCode.includes(i.varName.replace('v.', ''))).map((i, k) => `  @location(${k}) ${i.code},`),
-          '};',
+          ...filteredItems.map(i => `${prefix} ${i.code};`),
         ].join('\n');
+      } else if (key === 'attributes') {
+        // GLSL ES 3.00: vertex attributes use 'in'
+        code = items
+          .filter(i => testCode.includes(i.varName) && i.code.trim())
+          .map(i => this.doVarMap(`in ${i.code}`, scope))
+          .join('\n');
+      } else if (key === 'bindings') {
+        // GLSL ES 3.00: sampler uniforms need highp precision
+        code = items
+          .filter(i => testCode.includes(i.varName))
+          .map(i => this.doVarMap(i.code, scope))
+          .map(i => i.replace(/^(uniform\s+)(sampler\S+)(\s+)/, '$1highp $2$3'))
+          .join('\n');
       } else {
         code = items
           .filter(i => testCode.includes(i.varName))
@@ -376,6 +405,11 @@ ${code}`;
     });
 
     return headCode ? headCode + '\n\n' : '';
+  }
+
+  /** 检查代码中是否使用了导数函数 */
+  static hasDerivatives(code: string): boolean {
+    return /dFdx\(|dFdy\(|fwidth\(/.test(code);
   }
 
   getLinkedVaryingNodes(nodeId: number, output: Array<SGNodeData<ReteVaryingNode>> = []): Array<SGNodeData<ReteVaryingNode>> {
@@ -440,9 +474,11 @@ ${code}`;
     return Object.keys(this.context.uniforms).reduce((acc, contextKey) => {
       let { varName, code } = this.context.uniforms[contextKey];
       varName = varName.replace('u.', '');
+      // GLSL: code = "float sg_xxx" 或 "vec3 sg_xxx"
+      const type = code.replace(varName, '').trim();
       acc[contextKey] = {
         name: varName,
-        type: code.replace(varName + ': ', ''),
+        type,
       };
       return acc;
     }, {} as UniformMap);
@@ -451,10 +487,14 @@ ${code}`;
   getBindingMap() {
     return Object.keys(this.context.bindings).reduce((acc, key) => {
       const { varName, code, index } = this.context.bindings[key];
-      const type = code.match(/\: ([_a-z0-9<>]+)/i)!;
+      // GLSL: uniform sampler2D name;  → type=sampler2D
+      // 或: // sampler state: ...
+      let type = 'sampler2D';
+      const typeMatch = code.match(/uniform\s+(sampler\S+)\s+/);
+      if (typeMatch) type = typeMatch[1];
       acc[key] = {
         name: varName,
-        type: type[1],
+        type,
         index: index!,
       };
       return acc;
@@ -491,7 +531,8 @@ ${code}`;
     if (node.name === VaryingRC.Name) {
       if (!varyingBlocks[0]) throw new Error('compile varying preview failed: missing CustomInterpolatorBlock');
       const { varName } = this.getContext('varyings', varyingBlocks[0], varyingBlocks[0].data.varyingValueName)!;
-      const bodyCode = SGTemplates.unlit.frag(this.prependFragSharedCode(`*baseColor = ${varName}.xyz;`));
+      // GLSL: 直接赋值而非解引用
+      const bodyCode = SGTemplates.unlit.frag(this.prependFragSharedCode(`baseColor = ${varName}.xyz;`));
       const headCode = this.compileHeadCode(bodyCode, 'frag');
       fragCode = headCode + '\n' + bodyCode;
       vertBody += this.getAutoVaryingsCode(fragCode);
@@ -547,7 +588,7 @@ ${code}`;
       parameters: (this.graphData as ShaderGraphData).parameters,
       resource: this.resource,
       vertCode: SG_VERT + vertHeadCode + vertBody,
-      fragCode: fragHeadCode + fragBody,
+      fragCode: SG_FRAG + fragHeadCode + fragBody,
       uniformMap: this.getUniformMap(),
       bindingMap: this.getBindingMap(),
     };
@@ -619,7 +660,7 @@ const stringifyFloat = (num: number | number[] | string): string => {
 };
 
 const stringifyVector = (value: Array<number | string>, len: 2 | 3 | 4): string => {
-  return `vec${len}f(${new Array(len)
+  return `vec${len}(${new Array(len)
     .fill(0)
     .map((v, k) => stringifyFloat(value[k] || 0))
     .join(', ')})`;

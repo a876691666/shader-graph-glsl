@@ -78,14 +78,14 @@ export class RotateRC extends RC {
 
     const unit = node.data.unitValue;
     const unitVarName = unit === 'degrees' ? 'Degrees' : 'Rotation';
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV_: vec2f, Center: vec2f, ${unitVarName}: f32) -> vec2f {
-    ${unit === 'degrees' ? 'let Rotation = Degrees * (3.1415926/180.0);' : ''}
-    var UV = UV_ - Center;
-    let s = sin(Rotation);
-    let c = cos(Rotation);
-    let arg = (vec4f(c, s, -s, c) * 0.5 + 0.5) * 2.0 - 1.0;
-    UV = UV.xy * mat2x2f(arg.xy, arg.zw);
+    const codeFn = (varName: string) => `
+vec2 ${varName}(vec2 UV_, vec2 Center, float ${unitVarName}) {
+    ${unit === 'degrees' ? 'float Rotation = Degrees * (3.1415926/180.0);' : ''}
+    vec2 UV = UV_ - Center;
+    float s = sin(Rotation);
+    float c = cos(Rotation);
+    vec4 arg = (vec4(c, s, -s, c) * 0.5 + 0.5) * 2.0 - 1.0;
+    UV = UV.xy * mat2(arg.xy, arg.zw);
     UV += Center;
     return UV;
 }`;
@@ -93,7 +93,7 @@ fn ${varName}(UV_: vec2f, Center: vec2f, ${unitVarName}: f32) -> vec2f {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${rotationVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${rotationVar});`,
     };
   }
 }

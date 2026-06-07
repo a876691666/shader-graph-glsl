@@ -85,11 +85,11 @@ export class SubGraphRC extends RC {
     const inputVars: string[] = [];
     inputs.forEach(key => {
       inputVars.push(compiler.getInputVarConverted(node, key));
-      fnInputs.push(`${key}: ${compiler.getTypeClass(node.data[key + 'ValueType'])}`);
+      fnInputs.push(`${compiler.getTypeClass(node.data[key + 'ValueType'])} ${key}`);
     });
     const outVars = outputs.map(key => compiler.getOutVarName(node, key, 'subGraphOut'));
     const outVarDefineCode = outputs
-      .map((v, k) => `var ${outVars[k]}: ${compiler.getTypeClass(node.data[v + 'ValueType'])};`)
+      .map((v, k) => `${compiler.getTypeClass(node.data[v + 'ValueType'])} ${outVars[k]};`)
       .join(' ');
 
     let fnVar = compiler.getContext('defines', node, node.data.assetValue.id)?.varName;
@@ -115,15 +115,15 @@ export class SubGraphRC extends RC {
           key,
         );
         fnOutputs.push(
-          `${subKey}: ptr<function, ${subGraphCompiler.getTypeClass(
+          `out ${subGraphCompiler.getTypeClass(
             subOutput.data[key + 'ValueType'],
-          )}>`,
+          )} ${subKey}`,
         );
-        fnOutputCodes.push(`*${subKey} = ${SubGraphRCOutVars_To_OutputRCInVars[subKey]};`);
+        fnOutputCodes.push(`${subKey} = ${SubGraphRCOutVars_To_OutputRCInVars[subKey]};`);
       });
 
-      const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName} (${[...fnInputs, ...fnOutputs, 'v: Varying'].join(', ')}) {
+      const codeFn = (varName: string) => `
+void ${varName} (${[...fnInputs, ...fnOutputs].join(', ')}) {
   ${subGraphCode}
 ${fnOutputCodes.map(i => `  ${i}`).join('\n')}
 }`;
@@ -135,7 +135,7 @@ ${fnOutputCodes.map(i => `  ${i}`).join('\n')}
         acc[curr] = outVars[i];
         return acc;
       }, {} as { [k: string]: string }),
-      code: `${outVarDefineCode} ${fnVar}(${[...inputVars, ...outVars.map(i => `&${i}`), 'v'].join(
+      code: `${outVarDefineCode} ${fnVar}(${[...inputVars, ...outVars].join(
         ', ',
       )});`,
     };

@@ -45,7 +45,7 @@ export class ReciprocalRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = 1.0 / ${inVar};`,
+      code: `${outVar} = 1.0 / ${inVar};`,
     };
   }
 }

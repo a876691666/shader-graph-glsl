@@ -45,31 +45,31 @@ export class ViewVectorRC extends RC {
     const node = { name: ViewVectorRC.Name, data: {} } as any;
     const suffix = SpaceSuffixMap[space];
     const key = 'viewVector' + suffix;
-    // 这里只 varying 运算的输入
-    const cameraWSVar = compiler.setContext('uniforms', node, 'cameraWS', varName => `${varName}: vec3<f32>`);
+    // 这里�?varying 运算的输�?
+    const cameraWSVar = compiler.setContext('uniforms', node, 'cameraWS', varName => `vec3 ${varName}`);
     const positionVar = PositionRC.initPositionContext(compiler, space);
 
     let vertVar: string;
     let fragVar: string;
     if (space === 'object') {
       const I_Model = TransformationMatrixRC.initMatrixContext(compiler, 'I_Model');
-      const codeCameraFn = (varName: string) => `let ${varName} = (${I_Model} * vec4<f32>(${cameraWSVar}, 1.0)).xyz;`;
+      const codeCameraFn = (varName: string) => `${varName} = (${I_Model} * vec4(${cameraWSVar}, 1.0)).xyz;`;
       const vertCameraVar = compiler.setContext('vertShared', node, 'camera' + suffix, codeCameraFn);
       const fragCameraVar = compiler.setContext('fragShared', node, 'camera' + suffix, codeCameraFn);
-      vertVar = compiler.setContext('vertShared', node, key, varName => `let ${varName} = ${vertCameraVar} - ${positionVar};`);
-      fragVar = compiler.setContext('fragShared', node, key, varName => `let ${varName} = ${fragCameraVar} - ${positionVar};`);
+      vertVar = compiler.setContext('vertShared', node, key, varName => `vec3 ${varName} = ${vertCameraVar} - ${positionVar};`);
+      fragVar = compiler.setContext('fragShared', node, key, varName => `vec3 ${varName} = ${fragCameraVar} - ${positionVar};`);
     } else if (space === 'world') {
-      const codeFn = (varName: string) => `let ${varName} = ${cameraWSVar} - ${positionVar};`;
+      const codeFn = (varName: string) => `vec3 ${varName} = ${cameraWSVar} - ${positionVar};`;
       vertVar = compiler.setContext('vertShared', node, key, codeFn);
       fragVar = compiler.setContext('fragShared', node, key, codeFn);
     } else if (space === 'view') {
-      const codeFn = (varName: string) => `let ${varName} = -${positionVar};`;
+      const codeFn = (varName: string) => `vec3 ${varName} = -${positionVar};`;
       vertVar = compiler.setContext('vertShared', node, key, codeFn);
       fragVar = compiler.setContext('fragShared', node, key, codeFn);
     } else {
       const viewVectorVar = ViewVectorRC.initViewVectorContext(compiler, 'world');
       const { TBN_IT, TBN_IT_sgn } = initTBNContext(compiler, 'world')!;
-      const codeFn = (varName: string) => `let ${varName} = ${TBN_IT_sgn} * (${TBN_IT} * ${viewVectorVar});`;
+      const codeFn = (varName: string) => `vec3 ${varName} = ${TBN_IT_sgn} * (${TBN_IT} * ${viewVectorVar});`;
       vertVar = compiler.setContext('vertShared', node, key, codeFn);
       fragVar = compiler.setContext('fragShared', node, key, codeFn);
     }

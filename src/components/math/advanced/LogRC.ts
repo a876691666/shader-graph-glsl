@@ -45,7 +45,7 @@ export class LogRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = log(${inVar});`,
+      code: `${outVar} = log(${inVar});`,
     };
   }
 }

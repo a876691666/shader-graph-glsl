@@ -78,7 +78,7 @@ export class ColorMaskRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = clamp(1.0 - (distance(${maskColorVar}, ${inVar}) - ${rangeVar}) / max(${fuzzinessVar}, 1e-5), 0.0, 1.0);`,
+      code: `${outVar} = clamp(1.0 - (distance(${maskColorVar}, ${inVar}) - ${rangeVar}) / max(${fuzzinessVar}, 1e-5), 0.0, 1.0);`,
     };
   }
 }

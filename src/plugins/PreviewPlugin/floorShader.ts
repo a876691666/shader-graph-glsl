@@ -1,35 +1,22 @@
 export const FloorShader = {
-  vert: /* wgsl */ `
-  struct Uniform {
-    modelViewMatrix: mat4x4f,
-    projectionMatrix: mat4x4f,
-  };
-  struct Varying {
-    @builtin(position) position: vec4<f32>,
-    @location(0) uv: vec2f,
-  }
-  
-  @group(0) @binding(0) var<uniform> u: Uniform;
-  
-  @vertex
-  fn main(
-    @location(0) position: vec3<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) normal: vec3<f32>,
-  ) -> Varying {
-    var v: Varying;
-    v.uv = uv;
-    v.position = u.projectionMatrix * u.modelViewMatrix * vec4( position, 1.0 );
-    return v;
+  vert: `#version 300 es
+  layout(location = 0) in vec3 position;
+  layout(location = 1) in vec2 uv;
+  out vec2 v_uv;
+  uniform mat4 modelViewMatrix;
+  uniform mat4 projectionMatrix;
+
+  void main() {
+    v_uv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }`,
 
-  frag: /* wgsl */ `
-  struct Varying {
-    @builtin(position) position: vec4<f32>,
-    @location(0) uv: vec2f,
-  }
-  @fragment
-  fn main() -> @location(0) vec4f {
-    return vec4f(0.07, 0.2, 0.34, 1); // #123456
+  frag: `#version 300 es
+  precision highp float;
+  in vec2 v_uv;
+  layout(location = 0) out vec4 fragColor;
+
+  void main() {
+    fragColor = vec4(0.07, 0.2, 0.34, 1.0);
   }`,
 };

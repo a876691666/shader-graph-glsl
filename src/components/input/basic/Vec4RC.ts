@@ -66,7 +66,7 @@ export class Vec4RC extends RC {
     const wVar = compiler.getInputVarConverted(node, 'w');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${compiler.compileValue([xVar, yVar, zVar, wVar], node.data.outValueType)};`,
+      code: `${outVar} = ${compiler.compileValue([xVar, yVar, zVar, wVar], node.data.outValueType)};`,
     };
   }
 }

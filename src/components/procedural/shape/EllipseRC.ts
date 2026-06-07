@@ -56,16 +56,16 @@ export class EllipseRC extends RC {
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2<f32>, Width: f32, Height: f32) -> f32 {
-  let d = length((UV * 2.0 - 1.) / vec2<f32>(Width, Height));
+    const codeFn = (varName: string) => `
+float ${varName}(vec2 UV, float Width, float Height) {
+  float d = length((UV * 2.0 - 1.) / vec2(Width, Height));
   return clamp((1.0 - d) / fwidth(d), 0.0, 1.0);
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar});`,
     };
   }
 }

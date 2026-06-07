@@ -56,7 +56,7 @@ export class Vec3RC extends RC {
     const zVar = compiler.getInputVarConverted(node, 'z');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${compiler.compileValue([xVar, yVar, zVar], node.data.outValueType)};`,
+      code: `${outVar} = ${compiler.compileValue([xVar, yVar, zVar], node.data.outValueType)};`,
     };
   }
 }

@@ -52,7 +52,7 @@ export class NormalStrengthRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = vec3f(${inVar}.rg * ${strengthVar}, mix(1.0, ${inVar}.b, clamp(${strengthVar}, 0., 1.0)));`,
+      code: `${outVar} = vec3(${inVar}.rg * ${strengthVar}, mix(1.0, ${inVar}.b, clamp(${strengthVar}, 0., 1.0)));`,
     };
   }
 }

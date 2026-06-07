@@ -2,7 +2,7 @@
 // 不能嵌套这个, 只是单层的
 type NoEmptyRecord<T> = T & (keyof T extends never ? 'No empty object' : {});
 
-export namespace wgsl {
+export namespace glsl {
   enum PrimitiveDataViewGet {
     f32 = 'getFloat32',
     u32 = 'getUint32',
@@ -205,18 +205,18 @@ export namespace wgsl {
     return info;
   }
 
-  // 更推荐使用 {} satisfies wgsl.Struct
-  export function struct<T extends wgsl.Struct>(struct: T) {
+  // 更推荐使用 {} satisfies glsl.Struct
+  export function struct<T extends glsl.Struct>(struct: T) {
     return struct;
   }
 
-  export class StructBuffer<T extends wgsl.Struct> {
+  export class StructBuffer<T extends glsl.Struct> {
     buffer: Uint8Array;
     view: StructView<NoEmptyRecord<T>>;
     constructor(public struct: NoEmptyRecord<T>, ignoreAlign?: boolean) {
-      const byteLength = wgsl.structSize(struct, ignoreAlign);
+      const byteLength = structSize(struct, ignoreAlign);
       this.buffer = new Uint8Array(byteLength);
-      this.view = wgsl.structView(this.buffer.buffer, struct, 0, ignoreAlign);
+      this.view = structView(this.buffer.buffer, struct, 0, ignoreAlign);
     }
 
     clone() {
@@ -232,7 +232,7 @@ export namespace wgsl {
     return typeStr;
   }
 
-  export function stringifyStruct<T extends wgsl.Struct>(
+export function stringifyStruct<T extends glsl.Struct>(
     name: string,
     struct: NoEmptyRecord<T>,
     structCache = new Map<string, { name: string; structStr: string }>(),

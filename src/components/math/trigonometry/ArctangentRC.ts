@@ -45,7 +45,7 @@ export class ArctangentRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = atan(${inVar});`,
+      code: `${outVar} = atan(${inVar});`,
     };
   }
 }

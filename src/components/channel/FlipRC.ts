@@ -73,6 +73,6 @@ export class FlipRC extends RC {
       .slice(0, typeLen)
       .map(i => Number(i).toFixed(1))
       .join(', ')})`;
-    return { outputs: { out: outVar }, code: `let ${outVar} = (${flipVar} * -2.0 + 1.0) * ${inVar};` };
+    return { outputs: { out: outVar }, code: `${outVar} = (${flipVar} * -2.0 + 1.0) * ${inVar};` };
   }
 }

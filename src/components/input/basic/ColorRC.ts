@@ -40,7 +40,7 @@ export class ColorRC extends RC {
     const outVar = compiler.getOutVarName(node, 'out', 'color');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${compiler.compileNodeValue(node, 'out')};`,
+      code: `${outVar} = ${compiler.compileNodeValue(node, 'out')};`,
     };
   }
 }

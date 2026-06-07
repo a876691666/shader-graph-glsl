@@ -65,7 +65,7 @@ export class SphereMaskRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = 1.0 - clamp( (distance(${coordsVar}, ${centerVar}) - ${radiusVar}) / (1.0 - ${hardnessVar}), 0.0, 1.0);`,
+      code: `${outVar} = 1.0 - clamp( (distance(${coordsVar}, ${centerVar}) - ${radiusVar}) / (1.0 - ${hardnessVar}), 0.0, 1.0);`,
     };
   }
 }

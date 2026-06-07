@@ -45,7 +45,7 @@ export class CeilingRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ceil(${inVar});`,
+      code: `${outVar} = ceil(${inVar});`,
     };
   }
 }

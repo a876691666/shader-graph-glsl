@@ -45,7 +45,7 @@ export class DDXYRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = abs(dpdx(${inVar})) + abs(dpdy(${inVar}));`,
+      code: `${outVar} = abs(dFdx(${inVar})) + abs(dFdy(${inVar}));`,
     };
   }
 }

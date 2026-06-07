@@ -85,14 +85,14 @@ export class TriplanarRC extends RC {
     let fnVar = '';
 
     if (type === 'default') {
-      const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(Texture: texture_2d<f32>, Position: vec3f, Normal: vec3f, Tile: f32, Blend: f32, Sampler: sampler) -> vec4f {
-  let Node_UV = Position * Tile;
-  var Node_Blend = pow(abs(Normal), vec3f(Blend));
-  Node_Blend /= dot(Node_Blend, vec3f(1.0));
-  let Node_X = textureSample(Texture, Sampler, Node_UV.zy);
-  let Node_Y = textureSample(Texture, Sampler, Node_UV.xz);
-  let Node_Z = textureSample(Texture, Sampler, Node_UV.xy);
+      const codeFn = (varName: string) => `
+vec4 ${varName}(sampler2D Texture, vec3 Position, vec3 Normal, float Tile, float Blend) {
+  vec3 Node_UV = Position * Tile;
+  vec3 Node_Blend = pow(abs(Normal), vec3(Blend));
+  Node_Blend /= dot(Node_Blend, vec3(1.0));
+  vec4 Node_X = texture(Texture, Node_UV.zy);
+  vec4 Node_Y = texture(Texture, Node_UV.xz);
+  vec4 Node_Z = texture(Texture, Node_UV.xy);
   return Node_X * Node_Blend.x + Node_Y * Node_Blend.y + Node_Z * Node_Blend.z;
 }`;
       fnVar = compiler.setContext('defines', node, type, codeFn);
@@ -102,8 +102,8 @@ fn ${varName}(Texture: texture_2d<f32>, Position: vec3f, Normal: vec3f, Tile: f3
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${
-        textureVar ? `${fnVar}(${[textureVar, positionVar, normalVar, tileVar, blendVar, samplerVar].join(',')})` : 'vec4f(1.0)'
+      code: `${outVar} = ${
+        textureVar ? `${fnVar}(${[textureVar, positionVar, normalVar, tileVar, blendVar].join(',')})` : 'vec4(1.0)'
       };`,
     };
   }

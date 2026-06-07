@@ -45,7 +45,7 @@ export class SignRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = sign(${inVar});`,
+      code: `${outVar} = sign(${inVar});`,
     };
   }
 }

@@ -61,18 +61,13 @@ export class SceneColorRC extends RC {
       'bindings',
       node,
       'colorTexture',
-      (varName, i) => `@group(0) @binding(${i}) var ${varName}: texture_2d<f32>;`,
+      (varName, i) => `uniform sampler2D ${varName};`,
     );
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
-    const samplerVar = compiler.compileValue(
-      { filter: 'point', warp: 'clamp' } satisfies SamplerValue,
-      ValueType.sampler,
-    );
     if (!uvVar) uvVar = ScreenPositionRC.initScreenPositionContext(compiler, 'default');
-
     return {
       outputs: { out: outVar },
-      code: /* wgsl */ `let ${outVar} = textureSample(${colorTextureVar}, ${samplerVar}, ${uvVar}.xy);`,
+      code: `${outVar} = texture(${colorTextureVar}, ${uvVar}.xy);`,
     };
   }
 }

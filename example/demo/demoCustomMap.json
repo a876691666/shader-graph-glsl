@@ -347,7 +347,7 @@
         "bodyValue": "",
         "bodyValueType": "string",
         "fileValueType": "string",
-        "codeValue": "fn regionLerp(FN_ARGS) {\n  var mixFactor = 1.0f;\n  if (Mask > 0.9 - 0.05) { mixFactor = Region0[0]; } else \n  if (Mask > 0.8 - 0.05) { mixFactor = Region0[1]; } else\n  if (Mask > 0.7 - 0.05) { mixFactor = Region0[2]; } else\n  if (Mask > 0.6 - 0.05) { mixFactor = Region0[3]; } else\n  if (Mask > 0.5 - 0.05) { mixFactor = Region1[0]; } else\n  if (Mask > 0.4 - 0.05) { mixFactor = Region1[1]; } else\n  if (Mask > 0.3 - 0.05) { mixFactor = Region1[2]; }\n\n  *Out = mix(ColorB, ColorA, vec3f(mixFactor));\n}",
+        "codeValue": "void regionLerp(FN_ARGS) {\n  float mixFactor = 1.0;\n  if (Mask > 0.9 - 0.05) { mixFactor = Region0[0]; } else \n  if (Mask > 0.8 - 0.05) { mixFactor = Region0[1]; } else\n  if (Mask > 0.7 - 0.05) { mixFactor = Region0[2]; } else\n  if (Mask > 0.6 - 0.05) { mixFactor = Region0[3]; } else\n  if (Mask > 0.5 - 0.05) { mixFactor = Region1[0]; } else\n  if (Mask > 0.4 - 0.05) { mixFactor = Region1[1]; } else\n  if (Mask > 0.3 - 0.05) { mixFactor = Region1[2]; }\n\n  Out = mix(ColorB, ColorA, vec3(mixFactor));\n}",
         "codeValueType": "string",
         "editingCodeValue": true,
         "editingCodeValueType": "bool",

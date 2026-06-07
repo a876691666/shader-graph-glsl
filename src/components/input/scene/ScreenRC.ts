@@ -39,7 +39,7 @@ export class ScreenRC extends RC {
 
   static initScreenContext(compiler: ShaderGraphCompiler, key: 'width' | 'height') {
     const node = { name: ScreenRC.Name, data: {} } as any;
-    const codeFn = (varName: string) => `${varName}: f32`;
+    const codeFn = (varName: string) => `float ${varName}`;
     return compiler.setContext('uniforms', node, key, codeFn);
   }
 

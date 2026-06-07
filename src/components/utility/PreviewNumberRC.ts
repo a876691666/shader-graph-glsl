@@ -48,85 +48,78 @@ export class PreviewNumberRC extends RC {
       'defines',
       node,
       'base',
-      varName => /* wgsl */ `
+      varName => `
 // Smaller Number Printing - @P_Malin
 // Creative Commons CC0 1.0 Universal (CC-0)
-
-// Feel free to modify, distribute or use in commercial code, just don't hold me liable for anything bad that happens!
-// If you use this code and want to give credit, that would be nice but you don't have to.
-
-// I first made this number printing code in https://www.shadertoy.com/view/4sf3RN
-// It started as a silly way of representing digits with rectangles.
-// As people started actually using this in a number of places I thought I would try to condense the 
-// useful function a little so that it can be dropped into other shaders more easily,
-// just snip between the perforations below.
-// Also, the licence on the previous shader was a bit restrictive for utility code.
-//
-// Disclaimer: The values printed may not be accurate!
-// Accuracy improvement for fractional values taken from TimoKinnunen https://www.shadertoy.com/view/lt3GRj
-
-// ---- 8< ---- GLSL Number Printing - @P_Malin ---- 8< ----
-// Creative Commons CC0 1.0 Universal (CC-0) 
 // https://www.shadertoy.com/view/4sBSWW
 
-const ${varName}_DigitBin = array(
-  480599.0,
-  139810.0,
-  476951.0,
-  476999.0,
-  350020.0,
-  464711.0,
-  464727.0,
-  476228.0,
-  481111.0,
-  481095.0,
-);
+const float ${varName}_DigitBin0 = 480599.0;
+const float ${varName}_DigitBin1 = 139810.0;
+const float ${varName}_DigitBin2 = 476951.0;
+const float ${varName}_DigitBin3 = 476999.0;
+const float ${varName}_DigitBin4 = 350020.0;
+const float ${varName}_DigitBin5 = 464711.0;
+const float ${varName}_DigitBin6 = 464727.0;
+const float ${varName}_DigitBin7 = 476228.0;
+const float ${varName}_DigitBin8 = 481111.0;
+const float ${varName}_DigitBin9 = 481095.0;
 
-fn ${varName}_PrintValue( vStringCoords: vec2f, fValue_: f32, fMaxDigits: f32, fDecimalPlaces: f32 ) -> f32 {       
+float ${varName}_GetDigitBin(int digit) {
+  if (digit == 0) return ${varName}_DigitBin0;
+  if (digit == 1) return ${varName}_DigitBin1;
+  if (digit == 2) return ${varName}_DigitBin2;
+  if (digit == 3) return ${varName}_DigitBin3;
+  if (digit == 4) return ${varName}_DigitBin4;
+  if (digit == 5) return ${varName}_DigitBin5;
+  if (digit == 6) return ${varName}_DigitBin6;
+  if (digit == 7) return ${varName}_DigitBin7;
+  if (digit == 8) return ${varName}_DigitBin8;
+  return ${varName}_DigitBin9;
+}
+float ${varName}_PrintValue(vec2 vStringCoords, float fValue_, float fMaxDigits, float fDecimalPlaces) {       
   if ((vStringCoords.y < 0.0) || (vStringCoords.y >= 1.0)) { 
     return 0.0;
   }
   
-  let bNeg = ( fValue_ < 0.0 );
-	let fValue = abs(fValue_);
+  float bNeg = (fValue_ < 0.0) ? 1.0 : 0.0;
+  float fValue = abs(fValue_);
     
-	let fLog10Value = log2(abs(fValue)) / log2(10.0);
-	let fBiggestIndex = max(floor(fLog10Value), 0.0);
-	var fDigitIndex = fMaxDigits - floor(vStringCoords.x);
-	var fCharBin = 0.0;
-	if (fDigitIndex > (-fDecimalPlaces - 1.01)) {
-		if (fDigitIndex > fBiggestIndex) {
-			if ((bNeg) && (fDigitIndex < (fBiggestIndex+1.5))) { 
+  float fLog10Value = log2(abs(fValue)) / log2(10.0);
+  float fBiggestIndex = max(floor(fLog10Value), 0.0);
+  float fDigitIndex = fMaxDigits - floor(vStringCoords.x);
+  float fCharBin = 0.0;
+  if (fDigitIndex > (-fDecimalPlaces - 1.01)) {
+    if (fDigitIndex > fBiggestIndex) {
+      if ((bNeg > 0.5) && (fDigitIndex < (fBiggestIndex+1.5))) { 
         fCharBin = 1792.0;
       }
-		} else {		
-			if (fDigitIndex == -1.0) {
-				if (fDecimalPlaces > 0.0) { 
+    } else {
+      if (fDigitIndex == -1.0) {
+        if (fDecimalPlaces > 0.0) { 
           fCharBin = 2.0;
         }
-			} else {
-        var fReducedRangeValue = fValue;
+      } else {
+        float fReducedRangeValue = fValue;
         if (fDigitIndex < 0.0) {
-          fReducedRangeValue = fract( fValue ); fDigitIndex += 1.0;
+          fReducedRangeValue = fract(fValue); fDigitIndex += 1.0;
         }
-				let fDigitValue = (abs(fReducedRangeValue / (pow(10.0, fDigitIndex))));
-        fCharBin = ${varName}_DigitBin[u32(floor(fDigitValue % 10.0))];
-			}
+        float fDigitValue = (abs(fReducedRangeValue / (pow(10.0, fDigitIndex))));
+        fCharBin = ${varName}_GetDigitBin(int(floor(mod(fDigitValue, 10.0))));
+      }
     }
-	}
-
-  return floor((fCharBin / pow(2.0, floor(fract(vStringCoords.x) * 4.0) + (floor(vStringCoords.y * 5.0) * 4.0)) % 2.0));
+  }
+  return floor((fCharBin / pow(2.0, floor(fract(vStringCoords.x) * 4.0) + (floor(vStringCoords.y * 5.0) * 4.0)) - floor(fCharBin / pow(2.0, floor(fract(vStringCoords.x) * 4.0) + (floor(vStringCoords.y * 5.0) * 4.0)) / 2.0) * 2.0));
 }`,
     );
     const colorMap = {
-      [ValueType.float]: 'vec3f(0.6627450980392157, 0.8784313725490196, 0.8941176470588236)',
-      [ValueType.vec2]: 'vec3f(0.7294117647058823, 0.9137254901960784, 0.6392156862745098)',
-      [ValueType.vec3]: 'vec3f(0.9764705882352941, 0.9882352941176471, 0.6901960784313725)',
-      [ValueType.vec4]: 'vec3f(0.9294117647058824, 0.807843137254902, 0.9372549019607843)',
+      [ValueType.float]: 'vec3(0.6627450980392157, 0.8784313725490196, 0.8941176470588236)',
+      [ValueType.vec2]: 'vec3(0.7294117647058823, 0.9137254901960784, 0.6392156862745098)',
+      [ValueType.vec3]: 'vec3(0.9764705882352941, 0.9882352941176471, 0.6901960784313725)',
+      [ValueType.vec4]: 'vec3(0.9294117647058824, 0.807843137254902, 0.9372549019607843)',
     };
 
     const print = (offset: string, suffix: string) =>
-      /* wgsl */ `vColour = mix( vColour, fontColor, ${fnBaseVar}_PrintValue( (fragCoord - vec2f(${offset})) / vFontSize, value${suffix}, fDigits, fDecimalPlaces));`;
+      `vColour = mix( vColour, fontColor, ${fnBaseVar}_PrintValue( (fragCoord - vec2(${offset})) / vFontSize, value${suffix}, fDigits, fDecimalPlaces));`;
     // prettier-ignore
     const printCodeMap = {
       [ValueType.float]: print('-40, 45.0', ''),
@@ -138,16 +131,15 @@ fn ${varName}_PrintValue( vStringCoords: vec2f, fValue_: f32, fMaxDigits: f32, f
       'defines',
       node,
       node.data.inValueType,
-      varName => /* wgsl */ `
-fn ${varName}(uv: vec2f, value: ${compiler.getTypeClass(node.data.inValueType)}) -> vec3f{
-  let fragCoord = uv * 100.0;
-  var vColour = vec3f(0.0);
-  let fontColor = ${colorMap[node.data.inValueType]};
-  let vFontSize = vec2f(10.0, 15.0); // Multiples of 4x5 work best
-  let fDecimalPlaces = 3.0;
-  let fDigits = 7.0;
+      varName => `
+vec3 ${varName}(vec2 _uv, ${compiler.getTypeClass(node.data.inValueType)} value) {
+  vec2 fragCoord = _uv * 100.0;
+  vec3 vColour = vec3(0.0);
+  vec3 fontColor = ${colorMap[node.data.inValueType]};
+  vec2 vFontSize = vec2(10.0, 15.0);
+  float fDecimalPlaces = 3.0;
+  float fDigits = 7.0;
 
-  // Print Value
   ${printCodeMap[node.data.inValueType]}
 
   return vColour;
@@ -158,7 +150,7 @@ fn ${varName}(uv: vec2f, value: ${compiler.getTypeClass(node.data.inValueType)})
     const uvVar = UVRC.initUVContext(compiler);
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${inVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${inVar});`,
     };
   }
 }

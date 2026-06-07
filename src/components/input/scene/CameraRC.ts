@@ -75,7 +75,7 @@ export class CameraRC extends RC {
       height: '',
     };
 
-    const codeFn = (varName: string) => `${varName}: f32`;
+    const codeFn = (varName: string) => `float ${varName}`;
 
     (['orthographic', 'farPlane', 'nearPlane', 'orthographic', 'width', 'height', 'zBufferSign'] as Array<keyof typeof outputs>).forEach(
       (key: keyof typeof outputs) => {
@@ -88,7 +88,7 @@ export class CameraRC extends RC {
     if (node.outputs.position.connections.length || node.outputs.direction.connections.length) {
       const I_View = TransformationMatrixRC.initMatrixContext(compiler, 'I_View');
       // TODO 确认是否正确
-      // 与unity的写法不一样, unity的实现有点绕, 结果与unity不一样, 需要检查逻辑...
+      // 与unity的写法不一�? unity的实现有点绕, 结果与unity不一�? 需要检查逻辑...
       // -1 * mul((float3x3)UNITY_MATRIX_M, transpose(mul(UNITY_MATRIX_I_M, UNITY_MATRIX_I_V)) [2].xyz)
       outputs.direction = `-(${I_View}[2].xyz)`;
       outputs.position = `${I_View}[3].xyz`;

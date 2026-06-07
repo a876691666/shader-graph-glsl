@@ -16,7 +16,7 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "node_modules/@webgpu/types/**/*"],
+  "include": ["src"],
 
   "references": [{ "path": "./tsconfig.node.json" }]
 }

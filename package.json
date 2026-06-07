@@ -1,7 +1,7 @@
 {
-  "name": "shader-graph-wgsl",
+  "name": "shader-graph-glsl",
   "version": "0.0.0",
-  "description": "shader graph for wgsl",
+  "description": "shader graph for GLSL (WebGL2 / renderer-agnostic)",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
@@ -21,23 +21,24 @@
   "keywords": [
     "node material",
     "shader graph",
-    "wgsl"
+    "glsl",
+    "webgl2"
   ],
   "author": "deepkolos@qq.com",
   "dependencies": {
+    "@codemirror/commands": "^6.3.3",
+    "@codemirror/lang-cpp": "^6.0.3",
+    "@codemirror/language": "^6.10.1",
+    "@codemirror/lint": "^6.4.2",
+    "@codemirror/state": "^6.0.1",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.25.1",
+    "codemirror": "^6.0.1",
+    "copy-to-clipboard": "3.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.151.3",
-    "copy-to-clipboard": "3.3.3",
     "rete-area-plugin": "^0.2.1",
-    "@codemirror/lint": "^6.4.2",
-    "@iizukak/codemirror-lang-wgsl": "^0.3.0",
-    "@codemirror/state": "^6.0.1",
-    "@codemirror/commands": "^6.3.3",
-    "@codemirror/language": "^6.10.1",
-    "@codemirror/view": "^6.25.1",
-    "@codemirror/theme-one-dark": "^6.1.2",
-    "codemirror": "^6.0.1",
+    "three": "^0.151.3",
     "use-debounce": "^9.0.4"
   },
   "devDependencies": {
@@ -45,7 +46,6 @@
     "@types/react-dom": "^18",
     "@types/three": "^0.150.2",
     "@vitejs/plugin-react": "^3.1.0",
-    "@webgpu/types": "latest",
     "less": "^4.1.3",
     "typescript": "^4.9.3",
     "vite": "^4.5.2"

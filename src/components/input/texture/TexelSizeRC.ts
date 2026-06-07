@@ -48,12 +48,12 @@ export class TexelSizeRC extends RC {
   }
 
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteTexelSizeNode>): SGNodeOutput {
-    // let widthVar = '0.0';
-    // let heightVar = '0.0';
+    // widthVar = '0.0';
+    // heightVar = '0.0';
     // const textureVar = compiler.getInputVar(node, 'texture');
 
     // if (textureVar) {
-    //   const sizeVar = compiler.setContext('uniforms', node, textureVar + '_size', varName => `${varName}: vec2<f32>`);
+    //   const sizeVar = compiler.setContext('uniforms', node, textureVar + '_size', varName => `vec2 ${varName}`);
     //   widthVar = sizeVar + '.x';
     //   heightVar = sizeVar + '.y';
     // }
@@ -67,7 +67,7 @@ export class TexelSizeRC extends RC {
 
     return {
       outputs: { width: `${dimVar}.x`, height: `${dimVar}.y` },
-      code: `let ${dimVar} = textureDimensions(${textureVar});`,
+      code: `${dimVar} = textureSize(${textureVar});`,
     };
   }
 }

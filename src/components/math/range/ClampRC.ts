@@ -57,7 +57,7 @@ export class ClampRC extends RC {
     const maxVar = compiler.getInputVarConverted(node, 'max');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = clamp(${inVar}, ${minVar}, ${maxVar});`,
+      code: `${outVar} = clamp(${inVar}, ${minVar}, ${maxVar});`,
     };
   }
 }

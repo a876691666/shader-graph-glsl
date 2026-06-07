@@ -52,7 +52,7 @@ export class CrossProductRC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = cross(${aVar}, ${bVar});`,
+      code: `${outVar} = cross(${aVar}, ${bVar});`,
     };
   }
 }

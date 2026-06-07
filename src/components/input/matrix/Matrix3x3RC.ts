@@ -40,6 +40,6 @@ export class Matrix3x3RC extends RC {
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteMatrix3x3Node>): SGNodeOutput {
     const outVar = compiler.getOutVarName(node, 'out', 'mat3');
     const values = node.data.outValue.map(Number).join(', ');
-    return { outputs: { out: outVar }, code: `let ${outVar} = mat3x3<f32>(${values});` };
+    return { outputs: { out: outVar }, code: `${outVar} = mat3(${values});` };
   }
 }

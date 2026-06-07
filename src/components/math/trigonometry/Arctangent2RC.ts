@@ -51,7 +51,7 @@ export class Arctangent2RC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {  
       outputs: { out: outVar },
-      code: `let ${outVar} = atan2(${aVar}, ${bVar});`,
+      code: `${outVar} = atan2(${aVar}, ${bVar});`,
     };
   }
 }

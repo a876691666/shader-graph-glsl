@@ -69,57 +69,57 @@ export class RoundedPolygonRC extends RC {
 
     const piVar = ConstantRC.initConstantContext(compiler, 'PI');
     const piHalfVar = ConstantRC.initConstantContext(compiler, 'PI_HALF');
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV_: vec2<f32>, Width: f32, Height: f32, Sides: f32, Roundness_: f32) -> f32 {
-  var Out: f32;
-  var UV = UV_ * 2. + vec2<f32>(-1.,-1.);
+    const codeFn = (varName: string) => `
+float ${varName}(vec2 UV_, float Width, float Height, float Sides, float Roundness_) {
+  float Out;
+  vec2 UV = UV_ * 2. + vec2(-1.,-1.);
   UV.x = UV.x / Width;
   UV.y = UV.y / Height;
-  let Roundness = clamp(Roundness_, 1e-6, 1.);
-  let i_sides = floor( abs( Sides ) );
-  let fullAngle = 2. * ${piVar} / i_sides;
-  let halfAngle = fullAngle / 2.;
-  let opositeAngle = ${piHalfVar} - halfAngle;
-  let diagonal = 1. / cos( halfAngle );
+  float Roundness = clamp(Roundness_, 1e-6, 1.);
+  float i_sides = floor( abs( Sides ) );
+  float fullAngle = 2. * ${piVar} / i_sides;
+  float halfAngle = fullAngle / 2.;
+  float opositeAngle = ${piHalfVar} - halfAngle;
+  float diagonal = 1. / cos( halfAngle );
   // Chamfer values
-  let chamferAngle = Roundness * halfAngle; // Angle taken by the chamfer
-  let remainingAngle = halfAngle - chamferAngle; // Angle that remains
-  let ratio = tan(remainingAngle) / tan(halfAngle); // This is the ratio between the length of the polygon's triangle and the distance of the chamfer center to the polygon center
+  float chamferAngle = Roundness * halfAngle; // Angle taken by the chamfer
+  float remainingAngle = halfAngle - chamferAngle; // Angle that remains
+  float ratio = tan(remainingAngle) / tan(halfAngle); // This is the ratio between the length of the polygon's triangle and the distance of the chamfer center to the polygon center
   // Center of the chamfer arc
-  let chamferCenter = vec2<f32>(
+  vec2 chamferCenter = vec2(
       cos(halfAngle) ,
       sin(halfAngle)
   )* ratio * diagonal;
   // starting of the chamfer arc
-  let chamferOrigin = vec2<f32>(
+  vec2 chamferOrigin = vec2(
       1.,
       tan(remainingAngle)
   );
   // Using Al Kashi algebra, we determine:
   // The distance distance of the center of the chamfer to the center of the polygon (side A)
-  let distA = length(chamferCenter);
+  float distA = length(chamferCenter);
   // The radius of the chamfer (side B)
-  let distB = 1. - chamferCenter.x;
+  float distB = 1. - chamferCenter.x;
   // The refence length of side C, which is the distance to the chamfer start
-  let distCref = length(chamferOrigin);
+  float distCref = length(chamferOrigin);
   // This will rescale the chamfered polygon to fit the uv space
   // diagonal = length(chamferCenter) + distB;
-  let uvScale = diagonal;
+  float uvScale = diagonal;
   UV *= uvScale;
-  var polaruv = vec2<f32>(
-      atan2( UV.y, UV.x ),
+  vec2 polaruv = vec2(
+      atan( UV.y, UV.x ),
       length(UV)
   );
   polaruv.x += ${piHalfVar} + 2.*${piVar};
-  polaruv.x = (polaruv.x + halfAngle) % fullAngle;
+  polaruv.x = mod((polaruv.x + halfAngle), fullAngle);
   polaruv.x = abs(polaruv.x - halfAngle);
-  UV = vec2<f32>( cos(polaruv.x), sin(polaruv.x) ) * polaruv.y;
+  UV = vec2( cos(polaruv.x), sin(polaruv.x) ) * polaruv.y;
   // Calculate the angle needed for the Al Kashi algebra
-  let angleRatio = 1. - (polaruv.x-remainingAngle) / chamferAngle;
+  float angleRatio = 1. - (polaruv.x-remainingAngle) / chamferAngle;
   // Calculate the distance of the polygon center to the chamfer extremity
-  let distC = sqrt( distA*distA + distB*distB - 2.*distA*distB*cos( ${piVar} - halfAngle * angleRatio ) );
+  float distC = sqrt( distA*distA + distB*distB - 2.*distA*distB*cos( ${piVar} - halfAngle * angleRatio ) );
   Out = UV.x;
-  let chamferZone = step(( halfAngle - polaruv.x ), chamferAngle); // ( halfAngle - polaruv.x ) < chamferAngle;
+  float chamferZone = step(( halfAngle - polaruv.x ), chamferAngle); // ( halfAngle - polaruv.x ) < chamferAngle;
   Out = mix( UV.x, polaruv.y / distC, chamferZone );
   // Output this to have the shape mask instead of the distance field
   Out = clamp((1. - Out) / fwidth(Out), 0.0, 1.0);
@@ -129,7 +129,7 @@ fn ${varName}(UV_: vec2<f32>, Width: f32, Height: f32, Sides: f32, Roundness_: f
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar}, ${sidesVar}, ${roundnessVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${widthVar}, ${heightVar}, ${sidesVar}, ${roundnessVar});`,
     };
   }
 }

@@ -60,7 +60,7 @@ export class RandomRangeRC extends RC {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = mix(${minVar}, ${maxVar}, ${fnVarName}(${seedVar}));`,
+      code: `${outVar} = mix(${minVar}, ${maxVar}, ${fnVarName}(${seedVar}));`,
     };
   }
 }

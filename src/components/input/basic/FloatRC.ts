@@ -29,7 +29,7 @@ export class FloatRC extends RC {
 
     meta.category = 'input/basic';
     meta.previewDisabled = true;
-    meta.keywords = ['vector', 'f32'];
+    meta.keywords = ['vector', 'float'];
   }
 
   async builder(node: ReteFloatNode) {
@@ -46,7 +46,7 @@ export class FloatRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'x');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar}: f32 = ${inVar};`,
+      code: `float ${outVar} = ${inVar};`,
     };
   }
 }

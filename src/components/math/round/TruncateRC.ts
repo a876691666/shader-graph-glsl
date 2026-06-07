@@ -45,7 +45,7 @@ export class TruncateRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = trunc(${inVar});`,
+      code: `${outVar} = sign(${inVar}) * floor(abs(${inVar}));`,
     };
   }
 }

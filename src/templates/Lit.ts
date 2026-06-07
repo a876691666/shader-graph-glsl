@@ -1,58 +1,65 @@
 export const LitSGTemplate = Object.freeze({
-  vert: (body: string) => /* wgsl */ `fn sg_vert(
-  positionOS: ptr<function, vec3<f32>>, 
-  normalOS: ptr<function, vec3<f32>>, 
-  tangentOS: ptr<function, vec3<f32>>,
-  v: ptr<function, Varying>
+  vert: (body: string) => `void sg_vert(
+  inout vec3 positionOS,
+  inout vec3 normalOS,
+  inout vec3 tangentOS
 ) {
 ${body}
 }`,
-  frag: (body: string) => /* wgsl */ `fn sg_frag(
-  baseColor: ptr<function, vec3<f32>>, 
-  alpha: ptr<function, f32>,
-  v: Varying
+  frag: (body: string) => `void sg_frag(
+  inout vec3 baseColor,
+  inout float alpha,
+  inout float metallic,
+  inout float smoothness,
+  inout vec3 emission,
+  inout float ao,
+  inout vec3 normalTS
 ) {
 ${body}
 }`,
 } as const);
 
 export const LitMaterialTemplate = {
-  vert: (sgCode: string) => /* wgsl */ `${sgCode}
+  vert: (sgCode: string) => `#version 300 es
 
-@group(0) @binding(0) var<uniform> u: Uniform;
+// -- 内置 uniform (用于 gl_Position 计算) --
+uniform mat4 sg_Matrix_ModelView;
+uniform mat4 sg_Matrix_Proj;
 
-@vertex
-fn main(
-  @location(0) position: vec3<f32>,
-  @location(1) uv: vec2<f32>,
-  @location(2) normal: vec3<f32>,
-) -> Varying {
-  var v: Varying;
-  var sg_position = vec3<f32>(position);
-  var sg_normal = vec3<f32>(normal);
-  var sg_tangent = vec3<f32>(0);
-  sg_vert(&sg_position, &sg_normal, &sg_tangent, &v);
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec2 uv;
+layout(location = 2) in vec3 normal;
 
-  v.position = u.sg_Matrix_Proj * u.sg_Matrix_ModelView * vec4<f32>(sg_position, 1.0);
+${sgCode}
 
-  return v;
+void main() {
+  vec3 sg_position = position;
+  vec3 sg_normal = normal;
+  vec3 sg_tangent = vec3(0.0);
+  sg_vert(sg_position, sg_normal, sg_tangent);
+  gl_Position = sg_Matrix_Proj * sg_Matrix_ModelView * vec4(sg_position, 1.0);
 }`,
 
-  frag: (sgCode: string) => /* wgsl */ `${sgCode}
+  frag: (sgCode: string) => `#version 300 es
+precision highp float;
 
-@group(0) @binding(0) var<uniform> u: Uniform;
+${sgCode}
 
-fn LinearToGammaSpace(linRGB: vec3f) -> vec3f {
-  return max(vec3f(1.055) * pow(max(linRGB, vec3f(0.0)), vec3f(0.416666667)) - 0.055, vec3f(0.0));
+vec3 LinearToGammaSpace(vec3 linRGB) {
+  return max(vec3(1.055) * pow(max(linRGB, vec3(0.0)), vec3(0.416666667)) - 0.055, vec3(0.0));
 }
 
-@fragment
-fn main(v: Varying) -> @location(0) vec4<f32> {
-  var sg_baseColor = vec3<f32>();
-  var sg_alpha = 1.0;
-  sg_frag(&sg_baseColor, &sg_alpha, v);
+layout(location = 0) out vec4 fragColor;
 
-  return vec4<f32>(LinearToGammaSpace(sg_baseColor), sg_alpha);
-  // return vec4<f32>(0.0, 1.0, 0.0, 1.0);
+void main() {
+  vec3 sg_baseColor = vec3(0.0);
+  float sg_alpha = 1.0;
+  float sg_metallic = 0.0;
+  float sg_smoothness = 0.5;
+  vec3 sg_emission = vec3(0.0);
+  float sg_ao = 1.0;
+  vec3 sg_normalTS = vec3(0.0, 0.0, 1.0);
+  sg_frag(sg_baseColor, sg_alpha, sg_metallic, sg_smoothness, sg_emission, sg_ao, sg_normalTS);
+  fragColor = vec4(LinearToGammaSpace(sg_baseColor), sg_alpha);
 }`,
 };

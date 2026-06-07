@@ -51,7 +51,7 @@ export class StepRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = step(${edgeVar}, ${inVar});`,
+      code: `${outVar} = step(${edgeVar}, ${inVar});`,
     };
   }
 }

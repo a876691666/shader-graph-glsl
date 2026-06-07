@@ -52,44 +52,44 @@ export class SimpleNoiseRC extends RC {
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
     const randFn = initRandContext(compiler);
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}_interpolate (a: f32, b: f32, t: f32) -> f32 {
+    const codeFn = (varName: string) => `
+float ${varName}_interpolate (float a, float b, float t) {
   return (1.0-t)*a + (t*b);
 }
-fn ${varName}_valueNoise (uv_: vec2<f32>) -> f32 {
-  let i = floor(uv_);
-  var f = fract(uv_);
+float ${varName}_valueNoise (vec2 uv_) {
+  vec2 i = floor(uv_);
+  vec2 f = fract(uv_);
   f = f * f * (3.0 - 2.0 * f);
 
-  let uv = abs(fract(uv_) - 0.5);
-  let c0 = i + vec2<f32>(0.0, 0.0);
-  let c1 = i + vec2<f32>(1.0, 0.0);
-  let c2 = i + vec2<f32>(0.0, 1.0);
-  let c3 = i + vec2<f32>(1.0, 1.0);
-  let r0 = ${randFn}(c0);
-  let r1 = ${randFn}(c1);
-  let r2 = ${randFn}(c2);
-  let r3 = ${randFn}(c3);
+  vec2 uv = abs(fract(uv_) - 0.5);
+  vec2 c0 = i + vec2(0.0, 0.0);
+  vec2 c1 = i + vec2(1.0, 0.0);
+  vec2 c2 = i + vec2(0.0, 1.0);
+  vec2 c3 = i + vec2(1.0, 1.0);
+  float r0 = ${randFn}(c0);
+  float r1 = ${randFn}(c1);
+  float r2 = ${randFn}(c2);
+  float r3 = ${randFn}(c3);
 
-  let bottomOfGrid = ${varName}_interpolate(r0, r1, f.x);
-  let topOfGrid = ${varName}_interpolate(r2, r3, f.x);
-  let t = ${varName}_interpolate(bottomOfGrid, topOfGrid, f.y);
+  float bottomOfGrid = ${varName}_interpolate(r0, r1, f.x);
+  float topOfGrid = ${varName}_interpolate(r2, r3, f.x);
+  float t = ${varName}_interpolate(bottomOfGrid, topOfGrid, f.y);
   return t;
 }
-fn ${varName}(UV: vec2<f32>, Scale: f32) -> f32 {
-  var t = 0.0;
+float ${varName}(vec2 UV, float Scale) {
+  float t = 0.0;
 
-  var freq = pow(2.0, 0.0);
-  var amp = pow(0.5, 3.0-0.0);
-  t += ${varName}_valueNoise(vec2<f32>(UV.x*Scale/freq, UV.y*Scale/freq))*amp;
+  float freq = pow(2.0, 0.0);
+  float amp = pow(0.5, 3.0-0.0);
+  t += ${varName}_valueNoise(vec2(UV.x*Scale/freq, UV.y*Scale/freq))*amp;
 
   freq = pow(2.0, 1.0);
   amp = pow(0.5, 3.0-1.0);
-  t += ${varName}_valueNoise(vec2<f32>(UV.x*Scale/freq, UV.y*Scale/freq))*amp;
+  t += ${varName}_valueNoise(vec2(UV.x*Scale/freq, UV.y*Scale/freq))*amp;
 
   freq = pow(2.0, 2.0);
   amp = pow(0.5, 3.0-2.0);
-  t += ${varName}_valueNoise(vec2<f32>(UV.x*Scale/freq, UV.y*Scale/freq))*amp;
+  t += ${varName}_valueNoise(vec2(UV.x*Scale/freq, UV.y*Scale/freq))*amp;
 
   return t;
 }`;
@@ -97,7 +97,7 @@ fn ${varName}(UV: vec2<f32>, Scale: f32) -> f32 {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${scaleVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${scaleVar});`,
     };
   }
 }

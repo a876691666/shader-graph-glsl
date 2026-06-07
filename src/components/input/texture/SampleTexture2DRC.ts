@@ -98,11 +98,11 @@ export class SampleTexture2DRC extends RC {
     let toLinearCode = '';
     if (typeValue === 'default' && texColorSpaceValue === 'sRGB') {
       const sRGBToLinear = ColorSpaceConversionRC.initFnContext(compiler, 'sRGB', 'Linear');
-      toLinearCode = `\n  ${outVar} = vec4f(${sRGBToLinear}(${outVar}.rgb), ${outVar}.a);`;
+      toLinearCode = `\n  ${outVar} = vec4(${sRGBToLinear}(${outVar}.rgb), ${outVar}.a);`;
     }
     return {
       outputs: { rgba: outVar, r: `${outVar}.r`, g: `${outVar}.g`, b: `${outVar}.b`, a: `${outVar}.a` },
-      code: `var ${outVar} = ${textureVar ? `textureSample(${textureVar}, ${samplerVar}, ${uvVar})` : 'vec4<f32>(0)'};${normalizeCode}${toLinearCode}`,
+      code: `${outVar} = ${textureVar ? `texture(${textureVar}, ${uvVar})` : 'vec4(0)'};${normalizeCode}${toLinearCode}`,
     };
   }
 }

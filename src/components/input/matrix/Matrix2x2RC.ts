@@ -40,6 +40,6 @@ export class Matrix2x2RC extends RC {
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteMatrix2x2Node>): SGNodeOutput {
     const outVar = compiler.getOutVarName(node, 'out', 'mat2');
     const values = node.data.outValue.map(Number).join(', ');
-    return { outputs: { out: outVar }, code: `let ${outVar} = mat2x2<f32>(${values});` };
+    return { outputs: { out: outVar }, code: `${outVar} = mat2(${values});` };
   }
 }

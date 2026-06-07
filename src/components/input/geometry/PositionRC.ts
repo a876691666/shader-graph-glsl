@@ -58,23 +58,24 @@ export class PositionRC extends RC {
       let code = '';
       if (space === 'world') {
         const ModelVar = TransformationMatrixRC.initMatrixContext(compiler, 'Model');
-        code = `let ${vertVar} = (${ModelVar} * vec4<f32>(*positionOS, 1.0)).xyz;`;
+        code = `vec3 ${vertVar} = (${ModelVar} * vec4(positionOS, 1.0)).xyz;`;
       } else if (space === 'view') {
         const ModelViewVar = TransformationMatrixRC.initMatrixContext(compiler, 'ModelView');
-        code = `let ${vertVar} = (${ModelViewVar} * vec4<f32>(*positionOS, 1.0)).xyz;`;
+        code = `vec3 ${vertVar} = (${ModelViewVar} * vec4(positionOS, 1.0)).xyz;`;
       } else {
-        code = `let ${vertVar} = vec3<f32>(0,0,0);`; // tangent
+        code = `vec3 ${vertVar} = vec3(0,0,0);`; // tangent
       }
       compiler.setContext('vertShared', node, key, { varName: vertVar, code });
     } else {
-      vertVar = '*' + vertVar;
+      // GLSL: inout 参数直接使用，无需指针解引用
+      // vertVar = '*' + vertVar;
     }
 
     const varyingVar = compiler.setContext(
       'varyings',
       node,
       key,
-      varName => `${varName}: vec3<f32>`,
+      varName => `vec3 ${varName}`,
     );
     const defVar = compiler.setVarNameMap(node, key + '_def', vertVar, varyingVar);
     compiler.setAutoVaryings(node, key, varyingVar, vertVar);

@@ -57,7 +57,7 @@ export class LerpRC extends RC {
     const tVar = compiler.getInputVarConverted(node, 't');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = mix(${aVar}, ${bVar}, ${tVar});`,
+      code: `${outVar} = mix(${aVar}, ${bVar}, ${tVar});`,
     };
   }
 }

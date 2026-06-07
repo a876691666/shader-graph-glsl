@@ -52,19 +52,19 @@ export class NoiseSineWaveRC extends RC {
     const minMaxVar = compiler.getInputVarConverted(node, 'minMax');
     const typeClass = compiler.getTypeClass(node.data.outValueType);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(in_: ${typeClass}, minMax: vec2<f32>) -> ${typeClass} {
-  let sinIn = sin(in_);
-  let sinInOffset = sin(in_ + 1.0);
-  let randomno = fract(sin((sinIn - sinInOffset) * (12.9898 + 78.233)) * 43758.5453);
-  let noise = mix(minMax.x, minMax.y, randomno);
+    const codeFn = (varName: string) => `
+${typeClass} ${varName}(${typeClass} _val, vec2 minMax) {
+  float sinIn = sin(_val);
+  float sinInOffset = sin(_val + 1.0);
+  float randomno = fract(sin((sinIn - sinInOffset) * (12.9898 + 78.233)) * 43758.5453);
+  float noise = mix(minMax.x, minMax.y, randomno);
   return sinIn + noise;
 }`;
     const fnVarName = compiler.setContext('defines', node, node.data.outValueType, codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVarName}(${inVar}, ${minMaxVar});`,
+      code: `${outVar} = ${fnVarName}(${inVar}, ${minMaxVar});`,
     };
   }
 }

@@ -45,7 +45,7 @@ export class LengthRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = length(${inVar});`,
+      code: `${outVar} = length(${inVar});`,
     };
   }
 }

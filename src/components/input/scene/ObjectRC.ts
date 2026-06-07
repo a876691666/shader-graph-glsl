@@ -43,16 +43,16 @@ export class ObjectRC extends RC {
       scale: '',
     };
 
-    let ModelVar: string = '';
+    let ModelVar = '';
     if (node.outputs.position.connections.length || node.outputs.scale.connections.length) {
       ModelVar = TransformationMatrixRC.initMatrixContext(compiler, 'Model');
-      outputs.position = `vec3f(${ModelVar}[0][3], ${ModelVar}[1][3], ${ModelVar}[2][3])`;
+      outputs.position = `vec3(${ModelVar}[0][3], ${ModelVar}[1][3], ${ModelVar}[2][3])`;
     }
 
     let code = '';
     if (node.outputs.scale.connections.length) {
       const scaleVar = compiler.getOutVarName(node, 'scale', 'objScale');
-      code = `let ${scaleVar} = vec3f(length(${ModelVar}[0].xyz), length(${ModelVar}[1].xyz), length(${ModelVar}[2].xyz));`;
+      code = `${scaleVar} = vec3(length(${ModelVar}[0].xyz), length(${ModelVar}[1].xyz), length(${ModelVar}[2].xyz));`;
       outputs.scale = scaleVar;
     }
 

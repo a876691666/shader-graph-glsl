@@ -52,12 +52,12 @@ export class ReflectionRC extends RC {
     if (node.data.inValueType === ValueType.float) {
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = ${inVar} - 2.0 * (${normalVar} * ${inVar}) * ${normalVar};`,
+        code: `${outVar} = ${inVar} - 2.0 * (${normalVar} * ${inVar}) * ${normalVar};`,
       };
     }
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = reflect(${inVar}, ${normalVar});`,
+      code: `${outVar} = reflect(${inVar}, ${normalVar});`,
     };
   }
 }

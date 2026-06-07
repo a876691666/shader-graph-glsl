@@ -46,7 +46,7 @@ export class RadiansToDegreesRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = degrees(${inVar});`,
+      code: `${outVar} = degrees(${inVar});`,
     };
   }
 }

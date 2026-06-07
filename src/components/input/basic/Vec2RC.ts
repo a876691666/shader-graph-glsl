@@ -52,7 +52,7 @@ export class Vec2RC extends RC {
     const yVar = compiler.getInputVarConverted(node, 'y');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${compiler.compileValue([xVar, yVar], node.data.outValueType)};`,
+      code: `${outVar} = ${compiler.compileValue([xVar, yVar], node.data.outValueType)};`,
     };
   }
 }

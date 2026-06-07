@@ -55,8 +55,8 @@ export class ParameterRC extends RC {
     editor.on('parameterdelete', ({ name }) => {
       const nodes = editor.nodes.filter(node => node.name === ParameterRC.Name && node.data.outValueName === name);
       nodes.forEach(node => {
-        // unity sg 是根据类型创建占位节点替换 删除已有, vfx graph则是不删除节点, 但是会标记invalid
-        // 目前简单移除节点
+        // unity sg 是根据类型创建占位节点替�?删除已有, vfx graph则是不删除节�? 但是会标记invalid
+        // 目前简单移除节�?
         editor.removeNode(node);
       });
     });

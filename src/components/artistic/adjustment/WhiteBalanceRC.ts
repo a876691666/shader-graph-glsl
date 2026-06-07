@@ -54,47 +54,47 @@ export class WhiteBalanceRC extends RC {
     const typeClass = compiler.getTypeClass(node.data.outValueType);
     const [tempVar, tintVar, inVar] = compiler.getInputVarConvertedArray(node, ['temperature', 'tint', 'in']);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>, Temperature: f32, Tint: f32) -> vec3<f32> {
+    const codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In, float Temperature, float Tint) {
     // Range ~[-1.67;1.67] works best
-    let t1 = Temperature * 10. / 6.;
-    let t2 = Tint * 10. / 6.;
+    float t1 = Temperature * 10. / 6.;
+    float t2 = Tint * 10. / 6.;
 
     // Get the CIE xy chromaticity of the reference white point.
     // Note: 0.31271 = x value on the D65 white point
-    let t1Check = step(0, t1);
-    let x = 0.31271 - t1 * (t1Check * 0.05 + (1.0 - t1Check) * 0.1);
-    // let x = 0.31271 - t1 * (t1 < 0. ? 0.1 : 0.05);
-    let standardIlluminantY = 2.87 * x - 3. * x * x - 0.27509507;
-    let y = standardIlluminantY + t2 * 0.05;
+    float t1Check = step(0.0, t1);
+    float x = 0.31271 - t1 * (t1Check * 0.05 + (1.0 - t1Check) * 0.1);
+    // x = 0.31271 - t1 * (t1 < 0. ? 0.1 : 0.05);
+    float standardIlluminantY = 2.87 * x - 3. * x * x - 0.27509507;
+    float y = standardIlluminantY + t2 * 0.05;
 
     // Calculate the coefficients in the LMS space.
-    let w1 = vec3<f32>(0.949237, 1.03542, 1.08728); // D65 white point
+    vec3 w1 = vec3(0.949237, 1.03542, 1.08728); // D65 white point
 
     // CIExyToLMS
-    let Y = 1.;
-    let X = Y * x / y;
-    let Z = Y * (1. - x - y) / y;
-    let L = 0.7328 * X + 0.4296 * Y - 0.1624 * Z;
-    let M = -0.7036 * X + 1.6975 * Y + 0.0061 * Z;
-    let S = 0.0030 * X + 0.0136 * Y + 0.9834 * Z;
-    let w2 = vec3<f32>(L, M, S);
+    float Y = 1.;
+    float X = Y * x / y;
+    float Z = Y * (1. - x - y) / y;
+    float L = 0.7328 * X + 0.4296 * Y - 0.1624 * Z;
+    float M = -0.7036 * X + 1.6975 * Y + 0.0061 * Z;
+    float S = 0.0030 * X + 0.0136 * Y + 0.9834 * Z;
+    vec3 w2 = vec3(L, M, S);
 
-    let balance = vec3<f32>(w1.x / w2.x, w1.y / w2.y, w1.z / w2.z);
+    vec3 balance = vec3(w1.x / w2.x, w1.y / w2.y, w1.z / w2.z);
 
-    let LIN_2_LMS_MAT = mat3x3<f32>(
+    mat3 LIN_2_LMS_MAT = mat3(
       3.90405e-1, 7.08416e-2, 2.31082e-2,
       5.49941e-1, 9.63172e-1, 1.28021e-1,
       8.92632e-3, 1.35775e-3, 9.36245e-1
     );
 
-    let LMS_2_LIN_MAT = mat3x3<f32>(
+    mat3 LMS_2_LIN_MAT = mat3(
       2.85847e+0, -2.10182e-1, -4.18120e-2,
       -1.62879e+0, 1.15820e+0, -1.18169e-1,
       -2.48910e-2, 3.24281e-4,  1.06867e+0
     );
 
-    var lms = LIN_2_LMS_MAT * In;
+    vec3 lms = LIN_2_LMS_MAT * In;
     lms *= balance;
     return LMS_2_LIN_MAT * lms;
 }`;
@@ -102,7 +102,7 @@ fn ${varName}(In: vec3<f32>, Temperature: f32, Tint: f32) -> vec3<f32> {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${inVar}, ${tempVar}, ${tintVar});`,
+      code: `${outVar} = ${fnVar}(${inVar}, ${tempVar}, ${tintVar});`,
     };
   }
 }

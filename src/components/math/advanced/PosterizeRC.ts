@@ -51,7 +51,7 @@ export class PosterizeRC extends RC {
     const stepsVar = compiler.getInputVarConverted(node, 'steps');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = floor(${inVar} / (1.0 / ${stepsVar})) * (1.0 / ${stepsVar});`,
+      code: `${outVar} = floor(${inVar} / (1.0 / ${stepsVar})) * (1.0 / ${stepsVar});`,
     };
   }
 }

@@ -45,7 +45,7 @@ export class NegateRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = -${inVar};`,
+      code: `${outVar} = -${inVar};`,
     };
   }
 }

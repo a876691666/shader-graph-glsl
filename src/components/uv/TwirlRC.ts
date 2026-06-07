@@ -59,19 +59,19 @@ export class TwirlRC extends RC {
 
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2f, Center: vec2f, Strength: f32, Offset: vec2f) -> vec2f {
-  let delta = UV - Center;
-  let angle = Strength * length(delta);
-  let x = cos(angle) * delta.x - sin(angle) * delta.y;
-  let y = sin(angle) * delta.x + cos(angle) * delta.y;
-  return vec2f(x + Center.x + Offset.x, y + Center.y + Offset.y);
+    const codeFn = (varName: string) => `
+vec2 ${varName}(vec2 UV, vec2 Center, float Strength, vec2 Offset) {
+  vec2 delta = UV - Center;
+  float angle = Strength * length(delta);
+  float x = cos(angle) * delta.x - sin(angle) * delta.y;
+  float y = sin(angle) * delta.x + cos(angle) * delta.y;
+  return vec2(x + Center.x + Offset.x, y + Center.y + Offset.y);
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${strengthVar}, ${offsetVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${centerVar}, ${strengthVar}, ${offsetVar});`,
     };
   }
 }

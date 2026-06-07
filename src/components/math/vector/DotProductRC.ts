@@ -53,12 +53,12 @@ export class DotProductRC extends RC {
     if (node.data.aValueType === ValueType.float) {
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = ${aVar} * ${bVar};`,
+        code: `${outVar} = ${aVar} * ${bVar};`,
       };
     }
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = dot(${aVar}, ${bVar});`,
+      code: `${outVar} = dot(${aVar}, ${bVar});`,
     };
   }
 }

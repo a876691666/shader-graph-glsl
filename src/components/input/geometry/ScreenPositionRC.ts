@@ -62,21 +62,21 @@ export class ScreenPositionRC extends RC {
     let code = '';
     if (mode === 'default') {
       const screenPositionVar = ScreenPositionRC.initScreenPositionContext(compiler, 'raw');
-      code = `let ${vertVar} = vec4f(${screenPositionVar}.xy / ${screenPositionVar}.w, 0., 0.);`;
+      code = `vec4 ${vertVar} = vec4(${screenPositionVar}.xy / ${screenPositionVar}.w, 0., 0.);`;
     } else if (mode === 'raw') {
       const positionWSVar = PositionRC.initPositionContext(compiler, 'world');
       const ViewProjVar = TransformationMatrixRC.initMatrixContext(compiler, 'ViewProj');
       // sar 没有flipped projection matrix, 所以就没有projectionSign参数
-      const codeFn = (varName: string) => /* wgsl */ `
- fn ${varName}(positionCS: vec4f) -> vec4f {
-  let o = positionCS * 0.5;
-  return vec4f(o.xy + o.w, positionCS.zw);
+      const codeFn = (varName: string) => `
+ vec4 ${varName}(vec4 positionCS) {
+  vec4 o = positionCS * 0.5;
+  return vec4(o.xy + o.w, positionCS.zw);
 }`;
       const fnVar = compiler.setContext('defines', node, 'computeScreenPos', codeFn);
-      code = `let ${vertVar} = ${fnVar}(${ViewProjVar} * vec4f(${positionWSVar}, 1.0));`;
+      code = `vec4 ${vertVar} = ${fnVar}(${ViewProjVar} * vec4(${positionWSVar}, 1.0));`;
     } else if (mode === 'center') {
       const screenPositionVar = ScreenPositionRC.initScreenPositionContext(compiler, 'raw');
-      code = `let ${vertVar} = vec4f((${screenPositionVar}.xy / ${screenPositionVar}.w) * 2.0 - 1.0, 0., 0.);`;
+      code = `vec4 ${vertVar} = vec4((${screenPositionVar}.xy / ${screenPositionVar}.w) * 2.0 - 1.0, 0., 0.);`;
     }
 
     compiler.setContext('vertShared', node, mode, { varName: vertVar, code });
@@ -84,7 +84,7 @@ export class ScreenPositionRC extends RC {
       'varyings',
       node,
       'v' + mode,
-      varName => `${varName}: vec4f`,
+      varName => `vec4 ${varName}`,
     );
     const defVar = compiler.setVarNameMap(node, mode, vertVar, varyingVar);
     compiler.setAutoVaryings(node, mode, varyingVar, vertVar);
@@ -104,7 +104,7 @@ export class ScreenPositionRC extends RC {
       const screenHeight = ScreenRC.initScreenContext(compiler, 'height');
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = fract(vec4f(((${screenPositionVar}.x / ${screenPositionVar}.w) * 2. - 1.) * ${screenWidth} / ${screenHeight}, (${screenPositionVar}.y / ${screenPositionVar}.w) * 2.0 - 1.0, 0.0, 0.0));`,
+        code: `${outVar} = fract(vec4(((${screenPositionVar}.x / ${screenPositionVar}.w) * 2. - 1.) * ${screenWidth} / ${screenHeight}, (${screenPositionVar}.y / ${screenPositionVar}.w) * 2.0 - 1.0, 0.0, 0.0));`,
       };
     }
   }

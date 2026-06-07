@@ -75,6 +75,6 @@ export class InvertColorsRC extends RC {
       .slice(0, typeLen)
       .map(i => Number(i).toFixed(1))
       .join(', ')})`;
-    return { outputs: { out: outVar }, code: `let ${outVar} = abs(${invertVar} - ${inVar});` };
+    return { outputs: { out: outVar }, code: `${outVar} = abs(${invertVar} - ${inVar});` };
   }
 }

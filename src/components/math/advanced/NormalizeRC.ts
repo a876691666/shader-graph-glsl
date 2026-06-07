@@ -48,7 +48,7 @@ export class NormalizeRC extends RC {
     }
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = normalize(${inVar});`,
+      code: `${outVar} = normalize(${inVar});`,
     };
   }
 }

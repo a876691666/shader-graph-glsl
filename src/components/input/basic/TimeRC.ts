@@ -59,7 +59,7 @@ export class TimeRC extends RC {
       smoothDelta: '',
     };
 
-    const codeFn = (varName: string) => `${varName}: f32`;
+    const codeFn = (varName: string) => `float ${varName}`;
 
     (Object.keys(outputs) as Array<keyof typeof outputs>).forEach((key: keyof typeof outputs) => {
       if (node.outputs[key].connections.length) {

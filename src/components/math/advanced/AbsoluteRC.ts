@@ -45,7 +45,7 @@ export class AbsoluteRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = abs(${inVar});`,
+      code: `${outVar} = abs(${inVar});`,
     };
   }
 }

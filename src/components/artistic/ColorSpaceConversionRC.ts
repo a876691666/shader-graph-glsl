@@ -63,70 +63,70 @@ export class ColorSpaceConversionRC extends RC {
     const node = { name: ColorSpaceConversionRC.Name };
     let codeFn: (n: string) => string;
     if (from === 'sRGB' && to === 'HSV') {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>) -> vec3<f32> {
-    let K = vec4<f32>(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    let P = mix(vec4<f32>(In.bg, K.wz), vec4<f32>(In.gb, K.xy), step(In.b, In.g));
-    let Q = mix(vec4<f32>(P.xyw, In.r), vec4<f32>(In.r, P.yzx), step(P.x, In.r));
-    let D = Q.x - min(Q.w, Q.y);
-    let E = 1e-10;
-    let V = (D == 0.0) ? Q.x : (Q.x + E);
-    return vec3<f32>(abs(Q.z + (Q.w - Q.y)/(6.0 * D + E)), D / (Q.x + E), V);
+      codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In) {
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 P = mix(vec4(In.bg, K.wz), vec4(In.gb, K.xy), step(In.b, In.g));
+    vec4 Q = mix(vec4(P.xyw, In.r), vec4(In.r, P.yzx), step(P.x, In.r));
+    float D = Q.x - min(Q.w, Q.y);
+    float E = 1e-10;
+    float V = (D == 0.0) ? Q.x : (Q.x + E);
+    return vec3(abs(Q.z + (Q.w - Q.y)/(6.0 * D + E)), D / (Q.x + E), V);
 }`;
     }
     if (from === 'sRGB' && to === 'Linear') {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>) -> vec3<f32> {
-  let linearRGBLo = In / 12.92;
-  let linearRGBHi = pow(max(abs((In + 0.055) / 1.055), vec3f(1.192092896e-07)), vec3<f32>(2.4, 2.4, 2.4));
-  let stepCheck = step(vec3f(0.04045), In);
+      codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In) {
+  vec3 linearRGBLo = In / 12.92;
+  vec3 linearRGBHi = pow(max(abs((In + 0.055) / 1.055), vec3(1.192092896e-07)), vec3(2.4, 2.4, 2.4));
+  vec3 stepCheck = step(vec3(0.04045), In);
   return stepCheck * linearRGBHi + (1.0 - stepCheck) * linearRGBLo;
 }`;
     }
 
     if (from === 'HSV' && to === 'sRGB') {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>) -> vec3<f32> {
-  let K = vec4<f32>(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-  let P = abs(fract(In.xxx + K.xyz) * 6.0 - K.www);
+      codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In) {
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 P = abs(fract(In.xxx + K.xyz) * 6.0 - K.www);
   return In.z * mix(K.xxx, clamp(P - K.xxx, 0.0, 1.0), In.y);
 }`;
     }
     if (from === 'HSV' && to === 'Linear') {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>) -> vec3<f32> {
-  let K = vec4<f32>(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-  let P = abs(fract(In.xxx + K.xyz) * 6.0 - K.www);
-  let RGB = In.z * mix(K.xxx, clamp(P - K.xxx, 0.0, 1.0), In.y);
-  let linearRGBLo = RGB / 12.92;
-  let linearRGBHi = pow(max(abs((RGB + 0.055) / 1.055), 1.192092896e-07), vec3<f32>(2.4, 2.4, 2.4));
-  let stepCheck = step(0.04045, In);
+      codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In) {
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 P = abs(fract(In.xxx + K.xyz) * 6.0 - K.www);
+  vec3 RGB = In.z * mix(K.xxx, clamp(P - K.xxx, 0.0, 1.0), In.y);
+  vec3 linearRGBLo = RGB / 12.92;
+  vec3 linearRGBHi = pow(max(abs((RGB + 0.055) / 1.055), 1.192092896e-07), vec3(2.4, 2.4, 2.4));
+  vec3 stepCheck = step(0.04045, In);
   return stepCheck * linearRGBHi + (1.0 - stepCheck) * linearRGBLo;
 }`;
     }
 
     if (from === 'Linear' && to === 'sRGB') {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>) -> vec3<f32> {
-  let sRGBLo = In * 12.92;
-  let sRGBHi = (pow(max(abs(In), vec3f(1.192092896e-07)), vec3<f32>(1.0 / 2.4, 1.0 / 2.4, 1.0 / 2.4)) * 1.055) - 0.055;
-  let stepCheck = step(vec3f(0.0031308), In);
+      codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In) {
+  vec3 sRGBLo = In * 12.92;
+  vec3 sRGBHi = (pow(max(abs(In), vec3(1.192092896e-07)), vec3(1.0 / 2.4, 1.0 / 2.4, 1.0 / 2.4)) * 1.055) - 0.055;
+  vec3 stepCheck = step(vec3(0.0031308), In);
   return stepCheck * sRGBHi + (1.0 - stepCheck) * sRGBLo;
 }`;
     }
     if (from === 'Linear' && to === 'HSV') {
-      codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(In: vec3<f32>) -> vec3<f32> {
-    let sRGBLo = In * 12.92;
-    let sRGBHi = (pow(max(abs(In), 1.192092896e-07), vec3<f32>(1.0 / 2.4, 1.0 / 2.4, 1.0 / 2.4)) * 1.055) - 0.055;
-    let stepCheck = step(vec3f(0.0031308), In);
-    let Linear = stepCheck * sRGBHi + (1.0 - stepCheck) * sRGBLo;
-    let K = vec4<f32>(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    let P = mix(vec4<f32>(Linear.bg, K.wz), vec4<f32>(Linear.gb, K.xy), step(Linear.b, Linear.g));
-    let Q = mix(vec4<f32>(P.xyw, Linear.r), vec4<f32>(Linear.r, P.yzx), step(P.x, Linear.r));
-    let D = Q.x - min(Q.w, Q.y);
-    let E = 1e-10;
-    return vec3<f32>(abs(Q.z + (Q.w - Q.y)/(6.0 * D + E)), D / (Q.x + E), Q.x);
+      codeFn = (varName: string) => `
+vec3 ${varName}(vec3 In) {
+    vec3 sRGBLo = In * 12.92;
+    vec3 sRGBHi = (pow(max(abs(In), 1.192092896e-07), vec3(1.0 / 2.4, 1.0 / 2.4, 1.0 / 2.4)) * 1.055) - 0.055;
+    vec3 stepCheck = step(vec3(0.0031308), In);
+    vec3 Linear = stepCheck * sRGBHi + (1.0 - stepCheck) * sRGBLo;
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 P = mix(vec4(Linear.bg, K.wz), vec4(Linear.gb, K.xy), step(Linear.b, Linear.g));
+    vec4 Q = mix(vec4(P.xyw, Linear.r), vec4(Linear.r, P.yzx), step(P.x, Linear.r));
+    float D = Q.x - min(Q.w, Q.y);
+    float E = 1e-10;
+    return vec3(abs(Q.z + (Q.w - Q.y)/(6.0 * D + E)), D / (Q.x + E), Q.x);
 }`;
     }
 
@@ -148,7 +148,7 @@ fn ${varName}(In: vec3<f32>) -> vec3<f32> {
     const fnVar = ColorSpaceConversionRC.initFnContext(compiler, from, to);
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${inVar});`,
+      code: `${outVar} = ${fnVar}(${inVar});`,
     };
   }
 }

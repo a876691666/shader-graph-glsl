@@ -41,6 +41,6 @@ export class BaseColorBlock extends RCBlock {
 
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteBaseColorBlock>): SGNodeOutput {
     const inVar = compiler.getInputVarConverted(node, 'baseColor');
-    return { outputs: {}, code: inVar ? `*baseColor = ${inVar};` : '' };
+    return { outputs: {}, code: inVar ? `baseColor = ${inVar};` : '' };
   }
 }

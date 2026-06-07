@@ -51,7 +51,7 @@ export class AddRC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${aVar} + ${bVar};`,
+      code: `${outVar} = ${aVar} + ${bVar};`,
     };
   }
 }

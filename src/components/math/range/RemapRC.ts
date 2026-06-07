@@ -57,7 +57,7 @@ export class RemapRC extends RC {
     const outMinMaxVar = compiler.getInputVarConverted(node, 'outMinMax');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${outMinMaxVar}.x + (${inVar} - ${inMinMaxVar}.x) * (${outMinMaxVar}.y - ${outMinMaxVar}.x) / (${inMinMaxVar}.y - ${inMinMaxVar}.x);`,
+      code: `${outVar} = ${outMinMaxVar}.x + (${inVar} - ${inMinMaxVar}.x) * (${outMinMaxVar}.y - ${outMinMaxVar}.x) / (${inMinMaxVar}.y - ${inMinMaxVar}.x);`,
     };
   }
 }

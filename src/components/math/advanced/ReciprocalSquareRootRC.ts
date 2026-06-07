@@ -46,7 +46,7 @@ export class ReciprocalSquareRootRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = inverseSqrt(${inVar});`,
+      code: `${outVar} = inversesqrt(${inVar});`,
     };
   }
 }

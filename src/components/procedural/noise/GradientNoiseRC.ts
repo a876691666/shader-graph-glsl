@@ -51,21 +51,21 @@ export class GradientNoiseRC extends RC {
 
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}_dir(p_: vec2<f32>) -> vec2<f32> {
-  let p = (p_ % 289.);
-  var x = (34. * p.x + 1.) * (p.x % 289.) + p.y;
-  x = (34. * x + 1.) * (x % 289.);
-  x = fract(x / 41.) * 2. - 1.;
-  return normalize(vec2<f32>(x - floor(x + 0.5), abs(x) - 0.5));
+    const codeFn = (varName: string) => `
+vec2 ${varName}_dir(vec2 p_) {
+  vec2 p = mod(p_, 289.0);
+  float x = (34.0 * p.x + 1.0) * mod(p.x, 289.0) + p.y;
+  x = (34.0 * x + 1.0) * mod(x, 289.0);
+  x = fract(x / 41.0) * 2.0 - 1.0;
+  return normalize(vec2(x - floor(x + 0.5), abs(x) - 0.5));
 }
-fn ${varName}(p: vec2<f32>) -> f32 {
-  let ip = floor(p);
-  var fp = fract(p);
-  let d00 = dot(${varName}_dir(ip), fp);
-  let d01 = dot(${varName}_dir(ip + vec2<f32>(0, 1)), fp - vec2<f32>(0, 1));
-  let d10 = dot(${varName}_dir(ip + vec2<f32>(1, 0)), fp - vec2<f32>(1, 0));
-  let d11 = dot(${varName}_dir(ip + vec2<f32>(1, 1)), fp - vec2<f32>(1, 1));
+float ${varName}(vec2 p) {
+  vec2 ip = floor(p);
+  vec2 fp = fract(p);
+  float d00 = dot(${varName}_dir(ip), fp);
+  float d01 = dot(${varName}_dir(ip + vec2(0, 1)), fp - vec2(0, 1));
+  float d10 = dot(${varName}_dir(ip + vec2(1, 0)), fp - vec2(1, 0));
+  float d11 = dot(${varName}_dir(ip + vec2(1, 1)), fp - vec2(1, 1));
   fp = fp * fp * fp * (fp * (fp * 6. - 15.) + 10.);
   return mix(mix(d00, d01, fp.y), mix(d10, d11, fp.y), fp.x);
 }`;
@@ -73,7 +73,7 @@ fn ${varName}(p: vec2<f32>) -> f32 {
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar} * ${scaleVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar} * ${scaleVar});`,
     };
   }
 }

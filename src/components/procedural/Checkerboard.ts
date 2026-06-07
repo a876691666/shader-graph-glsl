@@ -63,24 +63,24 @@ export class CheckerboardRC extends RC {
 
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV_: vec2<f32>, ColorA: vec3<f32>, ColorB: vec3<f32>, Frequency: vec2<f32>) -> vec3<f32> {
-  let UV = (UV_.xy + 0.5) * Frequency;
-  let derivatives = vec4<f32>(dpdx(UV), dpdy(UV));
-  let duv_length = sqrt(vec2<f32>(dot(derivatives.xz, derivatives.xz), dot(derivatives.yw, derivatives.yw)));
-  let width = 1.0;
-  let distance3 = 4.0 * abs(fract(UV + 0.25) - 0.5) - width;
-  let scale = 0.35 / duv_length.xy;
-  let freqLimiter = sqrt(clamp(1.1f - max(duv_length.x, duv_length.y), 0.0, 1.0));
-  let vector_alpha = clamp(distance3 * scale.xy, vec2<f32>(-1.0), vec2<f32>(1.0));
-  let alpha = clamp(0.5f + 0.5f * vector_alpha.x * vector_alpha.y * freqLimiter, 0.0, 1.0);
+    const codeFn = (varName: string) => `
+vec3 ${varName}(vec2 UV_, vec3 ColorA, vec3 ColorB, vec2 Frequency) {
+  vec2 UV = (UV_.xy + 0.5) * Frequency;
+  vec4 derivatives = vec4(dFdx(UV), dFdy(UV));
+  vec2 duv_length = sqrt(vec2(dot(derivatives.xz, derivatives.xz), dot(derivatives.yw, derivatives.yw)));
+  float width = 1.0;
+  vec2 distance3 = 4.0 * abs(fract(UV + 0.25) - 0.5) - width;
+  vec2 scale = 0.35 / duv_length.xy;
+  float freqLimiter = sqrt(clamp(1.1 - max(duv_length.x, duv_length.y), 0.0, 1.0));
+  vec2 vector_alpha = clamp(distance3 * scale.xy, vec2(-1.0), vec2(1.0));
+  float alpha = clamp(0.5 + 0.5 * vector_alpha.x * vector_alpha.y * freqLimiter, 0.0, 1.0);
   return mix(ColorA, ColorB, alpha);
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${colorAVar}, ${colorBVar}, ${frequencyVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${colorAVar}, ${colorBVar}, ${frequencyVar});`,
     };
   }
 }

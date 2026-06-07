@@ -76,3 +76,45 @@ export interface SGCompilation {
   vertCode: string;
   fragCode: string;
 }
+
+// ============================================================
+// 编译选项 — 支持自定义顶点属性 / varying / uniform 布局
+// ============================================================
+
+/** 顶点属性布局定义 */
+export interface VertexAttributeDef {
+  /** GLSL location */
+  location: number;
+  /** GLSL 类型 */
+  type: string;
+  /** 变量名 */
+  name: string;
+}
+
+/** 默认的顶点属性布局 (兼容 Three.js BufferGeometry) */
+export const DEFAULT_VERTEX_ATTRIBUTES: Record<string, VertexAttributeDef> = {
+  position: { location: 0, type: 'vec3', name: 'aPosition' },
+  uv: { location: 1, type: 'vec2', name: 'aUV' },
+  normal: { location: 2, type: 'vec3', name: 'aNormal' },
+  tangent: { location: 3, type: 'vec4', name: 'aTangent' },
+};
+
+/** 编译选项 */
+export interface SGCompilationOptions {
+  /** 顶点属性布局 */
+  vertexAttributes?: Record<string, VertexAttributeDef>;
+  /** 额外的 uniform 声明 (注入到头文件中) */
+  extraUniforms?: string[];
+  /** 额外的 varying out 声明 (顶点着色器) */
+  extraVaryingOut?: string[];
+  /** 额外的 varying in 声明 (片段着色器) */
+  extraVaryingIn?: string[];
+  /** GLSL 版本字符串 (默认 #version 300 es) */
+  glslVersion?: string;
+  /** 额外的 precision 声明 */
+  extraPrecision?: string[];
+  /** 注入到顶点 main() 开头的代码 */
+  vertMainPreamble?: string;
+  /** 注入到片段 main() 开头的代码 */
+  fragMainPreamble?: string;
+}

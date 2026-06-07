@@ -51,7 +51,7 @@ export class MinimumRC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = min(${aVar}, ${bVar});`,
+      code: `${outVar} = min(${aVar}, ${bVar});`,
     };
   }
 }

@@ -46,7 +46,7 @@ export class TriangleWaveRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = 2.0 * abs( 2.0 * (${inVar} - floor(0.5 + ${inVar})) ) - 1.0;`,
+      code: `${outVar} = 2.0 * abs( 2.0 * (${inVar} - floor(0.5 + ${inVar})) ) - 1.0;`,
     };
   }
 }

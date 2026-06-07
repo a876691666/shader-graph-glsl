@@ -46,7 +46,7 @@ export class HyperbolicSineRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = sinh(${inVar});`,
+      code: `${outVar} = (exp(${inVar}) - exp(-${inVar})) * 0.5;`,
     };
   }
 }

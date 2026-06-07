@@ -61,23 +61,23 @@ export class PolygonRC extends RC {
     let uvVar = compiler.getInputVarConverted(node, 'uv', false);
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(UV: vec2<f32>, Sides: f32, Width: f32, Height: f32) -> f32 {
-  let pi = 3.14159265359;
-  let aWidth = Width * cos(pi / Sides);
-  let aHeight = Height * cos(pi / Sides);
-  var uv = (UV * 2.0 - 1.0) / vec2<f32>(aWidth, aHeight);
+    const codeFn = (varName: string) => `
+float ${varName}(vec2 UV, float Sides, float Width, float Height) {
+  float pi = 3.14159265359;
+  float aWidth = Width * cos(pi / Sides);
+  float aHeight = Height * cos(pi / Sides);
+  vec2 uv = (UV * 2.0 - 1.0) / vec2(aWidth, aHeight);
   uv.y *= -1.0;
-  let pCoord = atan2(uv.x, uv.y);
-  let r = 2.0 * pi / Sides;
-  let d = cos(floor(0.5 + pCoord / r) * r - pCoord) * length(uv);
+  float pCoord = atan(uv.x, uv.y);
+  float r = 2.0 * pi / Sides;
+  float d = cos(floor(0.5 + pCoord / r) * r - pCoord) * length(uv);
   return clamp((1.0 - d) / fwidth(d), 0.0, 1.0);
 }`;
     const fnVar = compiler.setContext('defines', node, 'fn', codeFn);
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${fnVar}(${uvVar}, ${sidesVar}, ${widthVar}, ${heightVar});`,
+      code: `${outVar} = ${fnVar}(${uvVar}, ${sidesVar}, ${widthVar}, ${heightVar});`,
     };
   }
 }

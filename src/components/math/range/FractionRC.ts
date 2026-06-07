@@ -45,7 +45,7 @@ export class FractionRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = fract(${inVar});`,
+      code: `${outVar} = fract(${inVar});`,
     };
   }
 }

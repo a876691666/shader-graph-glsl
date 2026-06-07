@@ -53,16 +53,16 @@ export class RefractRC extends RC {
     let normalVar = compiler.getInputVarConverted(node, 'normal');
     const etaVar = compiler.getInputVarConverted(node, 'eta');
     const typeClass = compiler.getTypeClass(node.data.outValueType);
-    // wgsl refract in normal必须是vec234 不能是float
-    if (typeClass === 'f32') {
+    // refract 的 in/normal 必须是 vec234 不能是 float
+    if (typeClass === 'float') {
       return {
         outputs: { out: outVar },
-        code: `let ${outVar} = refract(vec2f(${inVar}, 0.0f), vec2f(${normalVar}, 0.0f), ${etaVar}).x;`,
+        code: `${outVar} = refract(vec2(${inVar}, 0.0), vec2(${normalVar}, 0.0), ${etaVar}).x;`,
       };
     }
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = refract(${inVar}, ${normalVar}, ${etaVar});`,
+      code: `${outVar} = refract(${inVar}, ${normalVar}, ${etaVar});`,
     };
   }
 }

@@ -174,7 +174,7 @@ export class CustomFunctionRC extends RC {
         const typeClass = compiler.getTypeClass(node.data[i + 'ValueType']);
         const isIn = i.startsWith('fnIn');
         const varName = i.replace(isIn ? 'fnIn' : 'fnOut', '');
-        return `${varName}: ${isIn ? typeClass : `ptr<function, ${typeClass}>`}`;
+        return `${isIn ? `${typeClass} ${varName}` : `out ${typeClass} ${varName}`}`;
       })
       .join(', ');
   }
@@ -189,21 +189,22 @@ export class CustomFunctionRC extends RC {
     const argsCode = CustomFunctionRC.getFnArgsCode(compiler, node);
     if (typeValue === 'string') {
       const codeFn = (varName: string) => {
-        return /* wgsl */ `
-  fn ${varName}(${argsCode}) {
-    ${outputs.reduce((body, out) => {
-      const outVarInBody = out.replace('fnOut', '');
-      return body.replace(outVarInBody, `*${outVarInBody}`);
-    }, bodyValue)}
+        const glslBody = outputs.reduce((body, out) => {
+          const outVarInBody = out.replace('fnOut', '');
+          return body.replace(outVarInBody, outVarInBody);
+        }, bodyValue);
+        return `
+  void ${varName}(${argsCode}) {
+    ${glslBody.replace(/\*([A-Z]\w+)/g, '$1')}
   }`;
       };
       fnVar = compiler.setContext('defines', node, `${removeWhiteSpace(node.data.nameValue)}_${hash(node.data.bodyValue)}`, codeFn);
     } else if (typeValue === 'code') {
-      const code = codeValue.replace(/FN_ARGS/g, argsCode);
-      fnVar = compiler.setContext('defines', node, hash(code), { varName: nameValue, code });
+      const glslCode = codeValue.replace(/FN_ARGS/g, argsCode).replace(/\*([A-Z]\w+)/g, '$1');
+      fnVar = compiler.setContext('defines', node, hash(glslCode), { varName: nameValue, code: glslCode });
     }
 
-    const outVarDefineCode = outputs.map((v, k) => `var ${outVars[k]}: ${compiler.getTypeClass(node.data[v + 'ValueType'])};`).join(' ');
+    const outVarDefineCode = outputs.map((v, k) => `${compiler.getTypeClass(node.data[v + 'ValueType'])} ${outVars[k]};`).join(' ');
 
     return {
       outputs: outputs.reduce((acc, curr, i) => {
@@ -211,7 +212,7 @@ export class CustomFunctionRC extends RC {
         acc[curr] = outVars[i];
         return acc;
       }, {}),
-      code: `${outVarDefineCode} ${fnVar}(${[...inVars, ...outVars.map(i => `&${i}`)].join(', ')});`,
+      code: `${outVarDefineCode} ${fnVar}(${[...inVars, ...outVars.map(i => i)].join(', ')});`,
     };
   }
 }

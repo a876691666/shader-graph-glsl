@@ -50,7 +50,7 @@ export class ConstantRC extends RC {
 
   static initConstantContext(compiler: ShaderGraphCompiler, type: TypeValue) {
     const node = { name: ConstantRC.Name, data: {} } as any;
-    return compiler.setContext('defines', node, type, varName => `const ${varName} = ${ValueMap[type]};`);
+    return compiler.setContext('defines', node, type, varName => `const float ${varName} = ${ValueMap[type]};`);
   }
 
   compileSG(compiler: ShaderGraphCompiler, node: SGNodeData<ReteConstantNode>): SGNodeOutput {

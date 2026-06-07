@@ -62,10 +62,10 @@ export class OutputRC extends RC {
     const inVars = inputs.map(key => compiler.getInputVarConverted(node, key));
     return {
       outputs: {},
-      code: `*baseColor = ${
+      code: `baseColor = ${
         inVars[0]
           ? compiler.typeConvert(inVars[0], node.data[inputs[0] + 'ValueType'], ValueType.vec3)
-          : 'vec3<f32>(0)'
+          : 'vec3(0)'
       };`,
     };
   }

@@ -43,7 +43,7 @@ export class UVRC extends RC {
       varName: 'uv',
       code: ``, // 使用内置 TBD
     });
-    const varyingVar = compiler.setContext('varyings', uvNode, 'vUv', varName => `${varName}: vec2<f32>`);
+    const varyingVar = compiler.setContext('varyings', uvNode, 'vUv', varName => `vec2 ${varName}`);
     const defVar = compiler.setVarNameMap(uvNode, 'uv', attrVar, varyingVar);
     compiler.setAutoVaryings(uvNode, 'uv', varyingVar, attrVar);
     return defVar;

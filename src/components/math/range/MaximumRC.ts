@@ -51,7 +51,7 @@ export class MaximumRC extends RC {
     const bVar = compiler.getInputVarConverted(node, 'b');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = max(${aVar}, ${bVar});`,
+      code: `${outVar} = max(${aVar}, ${bVar});`,
     };
   }
 }

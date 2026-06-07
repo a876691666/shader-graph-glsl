@@ -45,7 +45,7 @@ export class ArcsineRC extends RC {
     const inVar = compiler.getInputVarConverted(node, 'in');
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = asin(${inVar});`,
+      code: `${outVar} = asin(${inVar});`,
     };
   }
 }

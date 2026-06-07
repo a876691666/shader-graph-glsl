@@ -76,7 +76,7 @@ export class VaryingRC extends RC {
         'varyings',
         { name: CustomInterpolatorBlock.Name },
         node.data.outValueName,
-        varName => `${varName}: vec4<f32>`,
+        varName => `vec4 ${varName}`,
       );
     }
     return { outputs: { out: outVar }, code: '' };

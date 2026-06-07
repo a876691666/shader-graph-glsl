@@ -87,16 +87,16 @@ export class NormalFromTextureRC extends RC {
 
     if (!uvVar) uvVar = UVRC.initUVContext(compiler);
 
-    const codeFn = (varName: string) => /* wgsl */ `
-fn ${varName}(Texture: texture_2d<f32>, UV: vec2f, Offset_: f32, Strength: f32, Sampler: sampler) -> vec3f {
-  let Offset = pow(Offset_, 3.) * 0.1;
-  let offsetU = vec2f(UV.x + Offset, UV.y);
-  let offsetV = vec2f(UV.x, UV.y + Offset);
-  let normalSample = textureSample(Texture, Sampler, UV).r;
-  let uSample = textureSample(Texture, Sampler, offsetU).r;
-  let vSample = textureSample(Texture, Sampler, offsetV).r;
-  let va = vec3f(1., 0., (uSample - normalSample) * Strength);
-  let vb = vec3f(0., 1., (vSample - normalSample) * Strength);
+    const codeFn = (varName: string) => `
+vec3 ${varName}(sampler2D Texture, vec2 UV, float Offset_, float Strength) {
+  float Offset = pow(Offset_, 3.) * 0.1;
+  vec2 offsetU = vec2(UV.x + Offset, UV.y);
+  vec2 offsetV = vec2(UV.x, UV.y + Offset);
+  float normalSample = texture(Texture, UV).r;
+  float uSample = texture(Texture, offsetU).r;
+  float vSample = texture(Texture, offsetV).r;
+  vec3 va = vec3(1., 0., (uSample - normalSample) * Strength);
+  vec3 vb = vec3(0., 1., (vSample - normalSample) * Strength);
   return normalize(cross(va, vb));
 }
 `;
@@ -104,10 +104,10 @@ fn ${varName}(Texture: texture_2d<f32>, UV: vec2f, Offset_: f32, Strength: f32, 
 
     return {
       outputs: { out: outVar },
-      code: `let ${outVar} = ${
+      code: `${outVar} = ${
         textureVar
-          ? `${fnVar}(${textureVar}, ${uvVar}, ${offsetVar}, ${strengthVar}, ${samplerVar})`
-          : 'vec3f(0, 0, 1)'
+          ? `${fnVar}(${textureVar}, ${uvVar}, ${offsetVar}, ${strengthVar})`
+          : 'vec3(0, 0, 1)'
       };`,
     };
   }

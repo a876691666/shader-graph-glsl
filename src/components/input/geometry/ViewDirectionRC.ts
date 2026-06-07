@@ -53,14 +53,14 @@ export class ViewDirectionRC extends RC {
       const viewVectorVar = ViewVectorRC.initViewVectorContext(compiler, 'world');
       const { TBN_IT, TBN_IT_sgn } = initTBNContext(compiler, 'world')!;
       const codeFn = (varName: string) =>
-        `let ${varName} = normalize(${TBN_IT_sgn} * (${TBN_IT} * ${viewVectorVar}));`;
+        `vec3 ${varName} = normalize(${TBN_IT_sgn} * (${TBN_IT} * ${viewVectorVar}));`;
       const vertVar = compiler.setContext('vertShared', node, key, codeFn);
       const fragVar = compiler.setContext('fragShared', node, key, codeFn);
       return compiler.setVarNameMap(node, key + '_def', vertVar, fragVar);
     }
 
     const viewVectorVar = ViewVectorRC.initViewVectorContext(compiler, space);
-    const codeFn = (varName: string) => `let ${varName} = normalize(${viewVectorVar});`;
+    const codeFn = (varName: string) => `vec3 ${varName} = normalize(${viewVectorVar});`;
     const vertVar = compiler.setContext('vertShared', node, key, codeFn);
     const fragVar = compiler.setContext('fragShared', node, key, codeFn);
     return compiler.setVarNameMap(node, key + '_def', vertVar, fragVar);

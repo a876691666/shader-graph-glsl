@@ -53,10 +53,10 @@ export class BiTangentVectorRC extends RC {
     const normalSameSpace = NormalRC.initNormalContext(compiler, space);
     const tangentSameSpace = TangentVectorRC.initTangentVectorContext(compiler, space);
     const tangentOS = TangentVectorRC.initTangentVectorContext(compiler, 'object');
-    const code = `let ${vertVar} = cross(${normalSameSpace}, ${tangentSameSpace}.xyz) * ${tangentOS}.w;`;
+    const code = `${vertVar} = cross(${normalSameSpace}, ${tangentSameSpace}.xyz) * ${tangentOS}.w;`;
     compiler.setContext('vertShared', node, key, { varName: vertVar, code });
-    const varyingVar = compiler.setContext('varyings', node, key, varName => `${varName}: vec3f`);
-    const fragVar = compiler.setContext('fragShared', node, key, varName => `let ${varName} = normalize(${varyingVar});`);
+    const varyingVar = compiler.setContext('varyings', node, key, varName => `vec3 ${varName}`);
+    const fragVar = compiler.setContext('fragShared', node, key, varName => `${varName} = normalize(${varyingVar});`);
     const defVar = compiler.setVarNameMap(node, key + '_def', vertVar, fragVar);
     compiler.setAutoVaryings(node, key, varyingVar, vertVar);
     return defVar;
