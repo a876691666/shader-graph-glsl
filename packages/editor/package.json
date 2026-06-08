@@ -7,6 +7,11 @@
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
+  "style": "./dist/index.css",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
@@ -20,5 +25,8 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "three": "^0.151.0"
+  },
+  "devDependencies": {
+    "esbuild-plugin-less": "^1.3.38"
   }
 }

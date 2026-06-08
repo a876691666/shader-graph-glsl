@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup'
+import { lessLoader } from 'esbuild-plugin-less'
 
 export default defineConfig({
   entry: {
@@ -12,5 +13,5 @@ export default defineConfig({
   external: ['monaco-editor'],
   outDir: 'dist',
   splitting: false,
-  loader: { '.less': 'empty' },
+  esbuildPlugins: [lessLoader()],
 })

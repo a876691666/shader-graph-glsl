@@ -153,6 +153,7 @@ import {
 import { NodeData } from '../rete/core/data';
 import { Rete, ParameterData, GraphData } from '../types';
 import { SettingValueCfgs } from '../view';
+import { ShaderConfig } from '../runtime/ShaderConfig';
 
 export type SGBlock =
   // vert
@@ -367,6 +368,7 @@ export interface SGSetting {
 export interface ShaderGraphData extends GraphData {
   type: 'ShaderGraph' | 'SubGraph';
   version: string;
+  shaderConfig?: ShaderConfig;
   UIState: {
     showMainPreview?: boolean;
     showBlackBoard?: boolean;

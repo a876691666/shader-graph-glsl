@@ -26,19 +26,23 @@ export const MenuList: FC<MenuListProps> = ({ items, x, y, z, root }) => {
     const resizeObserver = new ResizeObserver(entries => {
       const { width, height } = entries[0].contentRect;
       const gap = 20;
+      let boundW = innerWidth;
+      let boundH = innerHeight;
       let px = x;
       let py = y;
       if (root) {
         const rootRect = root.getBoundingClientRect();
         px -= rootRect.left;
         py -= rootRect.top;
+        boundW = rootRect.width;
+        boundH = rootRect.height;
       }
-      const nx = Math.min(innerWidth - width - gap, px);
-      const ny = Math.min(innerHeight - height - gap, py);
+      const nx = Math.min(boundW - width - gap, px);
+      const ny = Math.min(boundH - height - gap, py);
       el.style.top = ny + 'px';
       el.style.left = nx + 'px';
       el.style.opacity = '1';
-      if (x > innerWidth - width * 2 - gap) setSubmenuPosition('left');
+      if (x > boundW - width * 2 - gap) setSubmenuPosition('left');
     });
     resizeObserver.observe(el);
 

@@ -1,7 +1,7 @@
 import './Moveable.less';
 import React, { FC, useRef, useEffect } from 'react';
 import { DefaultProps } from './types';
-import { getOffset, listen, listenWindow } from '../../rete/view/utils';
+import { listen, listenWindow } from '../../rete/view/utils';
 
 type Rect = [x: number, y: number, w: number, h: number, px: number, py: number];
 
@@ -34,7 +34,7 @@ export const Moveable: FC<MoveableProps> = ({ gap = 0, children, x = 0, y = 0, z
       let canRect: Rect = [0, 0, innerWidth, innerHeight, 0, 0];
       if (containerEl) {
         const { x, y, width, height } = containerEl.getBoundingClientRect();
-        const { x: offsetLeft, y: offsetTop } = getOffset(el.parentElement!, document.body, 100);
+        const { left: offsetLeft, top: offsetTop } = el.parentElement!.getBoundingClientRect();
         canRect = [x, y, width, height, offsetLeft, offsetTop];
       }
       canRectCache = canRect;

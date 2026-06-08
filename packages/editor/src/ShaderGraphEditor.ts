@@ -227,6 +227,7 @@ export class ShaderGraphEditor {
    */
   load(data: ShaderGraphData): void {
     this.inner.fromJSON(data);
+    this.inner.shaderConfig = data.shaderConfig;
     this._ready = true;
     this._resolveReady();
     this.emit('imported');
@@ -259,6 +260,8 @@ export class ShaderGraphEditor {
    * 编译图为 ShaderConfig
    *
    * 返回的 ShaderConfig 可直接用于 ShaderGraphRuntime。
+   * 编译结果会自动存储到 inner.shaderConfig 中，
+   * 并在 save() 时一并导出。
    *
    * @returns 着色器配置
    *
@@ -269,11 +272,17 @@ export class ShaderGraphEditor {
    * ```
    */
   async compile(): Promise<ShaderConfig> {
-    // 编译功能需要通过编译器实现，此处为 API 占位
-    // const result = await this.inner.compiler.compile(this.inner.toJSON());
-    // this.emit('compiled', result);
-    // return result;
-    throw new Error('compile() not yet implemented - use inner.compiler directly');
+    const graphData = this.inner.toJSON();
+    const compilation = await this.inner.compiler.compile(graphData);
+    const { compilationToShaderConfig } = await import('../../../src/runtime/ThreeAdapter');
+    const config = compilationToShaderConfig(
+      compilation,
+      graphData.id,
+      graphData.id,
+    );
+    this.inner.shaderConfig = config;
+    this.emit('compiled', config);
+    return config;
   }
 
   // ============================================================

@@ -35,6 +35,7 @@ import {
 import { ShaderGraphCompiler } from '../compilers';
 import { RCBlock } from '../components/ReteComponent';
 import { SubGraphProvider } from './SubGraphProvider';
+import { ShaderConfig } from '../runtime/ShaderConfig';
 
 declare module '../rete/core/events' {
   interface EventsTypes {
@@ -51,6 +52,7 @@ export class ShaderGraphEditor extends Rete.NodeEditor {
   clearing = false;
   editing!: 'ShaderGraph' | 'SubGraph';
   subGraphProvider?: SubGraphProvider;
+  shaderConfig?: ShaderConfig;
 
   disposables: Array<() => void> = [];
 
@@ -185,6 +187,7 @@ export class ShaderGraphEditor extends Rete.NodeEditor {
     this.clearing = true;
     super.clear();
     this.blackboardView.fromJSON([]);
+    this.shaderConfig = undefined;
     this.clearing = false;
     if (silent) this.silent = old;
   }
@@ -200,6 +203,8 @@ export class ShaderGraphEditor extends Rete.NodeEditor {
     const setting = json.setting || DEFAULT_SETTING();
     if (json.type === 'SubGraph') setting.template = 'subgraph';
     this.inspectorView.fromJSON(setting);
+
+    this.shaderConfig = json.shaderConfig;
 
     const { UIState } = json;
     this.blackboardView.setShowState(UIState?.showBlackBoard ?? true);
@@ -220,6 +225,7 @@ export class ShaderGraphEditor extends Rete.NodeEditor {
     json.version = pkg.version;
     json.setting = this.inspectorView.toJSON() as SGSetting;
     json.parameters = this.blackboardView.toJSON();
+    if (this.shaderConfig) json.shaderConfig = this.shaderConfig;
     return json;
   }
 
