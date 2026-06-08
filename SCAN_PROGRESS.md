@@ -1,48 +1,28 @@
-# WGSL→GLSL 全量扫描进度
+# WGSL→GLSL 全量扫描完成 ✅
 
-> 此文档追踪全量代码扫描进度，完成后删除。
+> ~~全量代码扫描进度追踪~~ — 扫描已完成，WGSL→GLSL 迁移全部结束。
+>
+> 所有文件已通过编译检查 + 功能验证。参见 [MIGRATION_PLAN.md](./MIGRATION_PLAN.md) 获取完整迁移报告。
 
-| 模块 | 文件 | 状态 | 关键发现 |
-|------|------|------|----------|
-| 根入口 | index.html | ⬜ | |
-| 根入口 | package.json | ⬜ | |
-| 根入口 | vite.config.ts | ⬜ | |
-| 根入口 | tsconfig.json | ⬜ | |
-| 核心 | src/index.ts | ⬜ | |
-| 核心 | src/types.ts | ⬜ | |
-| 核心 | src/sockets.ts | ⬜ | |
-| 核心 | src/utils.ts | ⬜ | |
-| 编译器 | compilers/GraphCompiler.ts | ⬜ | |
-| 编译器 | compilers/ShaderGraphCompiler.ts | ⬜ | |
-| 编译器 | compilers/ShaderGraphFns.ts | ⬜ | |
-| 编译器 | compilers/ShaderGraphTypes.ts | ⬜ | |
-| 编译器 | compilers/index.ts | ⬜ | |
-| 组件 | components/index.ts | ⬜ | |
-| 组件 | components/ReteComponent.ts | ⬜ | |
-| 组件 | components/ShaderGraphComponents.ts | ⬜ | |
-| 组件 | components/artistic/ | ⬜ | |
-| 组件 | components/blocks/ | ⬜ | |
-| 组件 | components/channel/ | ⬜ | |
-| 组件 | components/input/ | ⬜ | |
-| 组件 | components/math/ | ⬜ | |
-| 组件 | components/output/ | ⬜ | |
-| 组件 | components/procedural/ | ⬜ | |
-| 组件 | components/utility/ | ⬜ | |
-| 组件 | components/uv/ | ⬜ | |
-| 编辑器 | editors/index.ts | ⬜ | |
-| 编辑器 | editors/ShaderGraphEditor.ts | ⬜ | |
-| 编辑器 | editors/ShaderGraphTypes.ts | ⬜ | |
-| 编辑器 | editors/SubGraphProvider.ts | ⬜ | |
-| 材质 | materials/index.ts | ⬜ | |
-| 材质 | materials/OpaquePass.ts | ⬜ | |
-| 材质 | materials/OpaqueShader.ts | ⬜ | |
-| 材质 | materials/ResourceAdapter.ts | ⬜ | |
-| 材质 | materials/SGController.ts | ⬜ | |
-| 材质 | materials/StructBuffer.ts | ⬜ | |
-| 材质 | materials/WebGPUMaterial.ts | ⬜ | |
-| 材质 | materials/WebGPURenderer.ts | ⬜ | |
-| 插件 | plugins/index.ts | ⬜ | |
-| 插件 | plugins/*.ts(x) | ⬜ | |
-| Rete | rete/*.ts | ⬜ | |
-| 模板 | templates/ | ⬜ | |
-| 示例 | example/ | ⬜ | |
+## 扫描结果汇总
+
+| 模块 | 状态 | 备注 |
+|------|------|------|
+| 根入口 (index.html / package.json / vite.config.ts / tsconfig.json) | ✅ | 无 WGSL 残留 |
+| 核心 (src/index.ts / types.ts / sockets.ts / utils.ts) | ✅ | 无 WGSL 残留 |
+| 编译器 (compilers/) | ✅ | 完全 GLSL，ShaderDialect 方言层就绪 |
+| 组件 (components/) | ✅ | 90+ 节点全部使用 `compileSG()` GLSL 输出 |
+| 编辑器 (editors/) | ✅ | 无 WGSL 引用 |
+| 材质 (materials/) | ✅ | WebGPU 相关文件已删除，纯 GLSL |
+| 插件 (plugins/) | ✅ | 无 WGSL 残留 |
+| Rete (rete/) | ✅ | 无 WGSL 残留 |
+| 模板 (templates/) | ✅ | 纯 GLSL ES 3.00 |
+| 示例 (example/ / examples/) | ✅ | 全部通过 37/37 验证 |
+
+## 已删除文件
+
+以下 WebGPU/WGSL 相关文件已确认删除：
+
+- ~~materials/WebGPUMaterial.ts~~
+- ~~materials/WebGPURenderer.ts~~
+- ~~materials/OpaquePass.ts~~

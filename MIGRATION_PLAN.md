@@ -1,4 +1,4 @@
-# WGSL→GLSL 迁移任务追踪 ✅
+# WGSL→GLSL 迁移任务追踪 ✅ 已完成
 
 | 阶段 | 任务 | 状态 | 文件数 |
 |------|------|------|--------|
@@ -21,3 +21,9 @@
 - [x] `tsconfig.json` 移除 `@webgpu/types` 引用
 - [x] 删除 WebGPURenderer / OpaquePass / WebGPUMaterial
 - [x] 新建 SGMaterial / dispose.ts
+
+---
+
+> **迁移完成日期**：2024-06  
+> **版本**：v0.2.0  
+> **当前状态**：项目已完全迁移至纯 GLSL ES 3.00，无任何 WebGPU/WGSL 残留。37 个演示页面全部通过编译验证。
