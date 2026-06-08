@@ -201,7 +201,7 @@
       "data": {
         "outValue": {
           "id": "flowmap.png",
-          "label": "a876691666"
+          "label": "deepkolos"
         },
         "outValueType": "texture2d",
         "outValueName": "FlowMap",
@@ -1540,7 +1540,7 @@
       "data": {
         "outValue": {
           "id": "https://avatars.githubusercontent.com/u/12824616?v=4",
-          "label": "a876691666"
+          "label": "deepkolos"
         },
         "outValueType": "texture2d",
         "outValueName": "MainTexture",
@@ -1571,7 +1571,7 @@
       "data": {
         "outValue": {
           "id": "https://avatars.githubusercontent.com/u/12824616?v=4",
-          "label": "a876691666"
+          "label": "deepkolos"
         },
         "outValueType": "texture2d",
         "outValueName": "MainTexture",
@@ -1818,7 +1818,7 @@
       "type": "texture2d",
       "defalutValue": {
         "id": "flowmap.png",
-        "label": "a876691666"
+        "label": "deepkolos"
       },
       "exposed": true
     },
@@ -1839,7 +1839,7 @@
       "type": "texture2d",
       "defalutValue": {
         "id": "https://avatars.githubusercontent.com/u/12824616?v=4",
-        "label": "a876691666"
+        "label": "deepkolos"
       },
       "exposed": true
     }
