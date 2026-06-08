@@ -3,7 +3,7 @@
  * Three.js 集成示例
  * ============================================================
  *
- * 展示如何将 @shader-graph-glsl/runtime 与 Three.js 结合使用。
+ * 展示如何将 @xifu/shader-graph-glsl/runtime 与 Three.js 结合使用。
  *
  * 两种集成方式:
  * 1. 使用 ShaderConfig 驱动 THREE.RawShaderMaterial
@@ -13,7 +13,7 @@
  */
 
 import * as THREE from 'three';
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime';
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime';
 
 /**
  * 方式一: RawShaderMaterial 集成

@@ -14,7 +14,7 @@
  * # 快速开始
  *
  * ```ts
- * import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime';
+ * import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime';
  *
  * const canvas = document.getElementById('canvas') as HTMLCanvasElement;
  * const runtime = new ShaderGraphRuntime(canvas);

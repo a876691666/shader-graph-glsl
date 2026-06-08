@@ -1,34 +1,20 @@
 {
-  "name": "@shader-graph-glsl/editor",
+  "name": "@xifu/internal-editor",
   "version": "0.1.0",
-  "description": "Shader Graph GLSL Editor — visual node-based shader editor built on Rete.js",
+  "private": false,
+  "description": "Shader Graph GLSL Editor — internal source package",
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
-  "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
-    }
-  },
-  "files": [
-    "src",
-    "README.md"
-  ],
   "scripts": {
-    "test": "echo 'No tests yet'"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
-  "keywords": [
-    "shader-graph",
-    "glsl",
-    "editor",
-    "node-editor",
-    "visual-programming"
-  ],
+  "keywords": [],
   "license": "MIT",
   "dependencies": {
-    "@shader-graph-glsl/runtime": "workspace:*"
+    "@xifu/shader-graph-glsl": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0",

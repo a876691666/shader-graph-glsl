@@ -145,7 +145,7 @@
       "data": {
         "outValue": {
           "id": "https://avatars.githubusercontent.com/u/12824616?v=4",
-          "label": "deepkolos"
+          "label": "a876691666"
         },
         "outValueType": "texture2d",
         "expanded": true
@@ -292,7 +292,7 @@
       "data": {
         "outValue": {
           "id": "https://avatars.githubusercontent.com/u/12824616?v=4",
-          "label": "deepkolos"
+          "label": "a876691666"
         },
         "outValueType": "texture2d",
         "outValueName": "map",
@@ -665,7 +665,7 @@
       "type": "texture2d",
       "defalutValue": {
         "id": "https://avatars.githubusercontent.com/u/12824616?v=4",
-        "label": "deepkolos"
+        "label": "a876691666"
       },
       "exposed": true
     }

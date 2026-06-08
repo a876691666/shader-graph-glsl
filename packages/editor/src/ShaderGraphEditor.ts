@@ -9,7 +9,7 @@
  * # 快速开始
  *
  * ```ts
- * import { ShaderGraphEditor } from '@shader-graph-glsl/editor';
+ * import { ShaderGraphEditor } from '@xifu/shader-graph-glsl/editor';
  *
  * const container = document.getElementById('editor')!;
  * const editor = new ShaderGraphEditor(container);
@@ -39,7 +39,7 @@
 
 import { ShaderGraphEditor as InnerEditor } from '../../../src/editors/ShaderGraphEditor';
 import { createRoot } from 'react-dom/client';
-import type { ShaderGraphData, SGSetting, SGSettingValueCfg } from '../../../src/editors/ShaderGraphTypes';
+import type { ShaderGraphData, SGSetting, SGSettingValueCfgs } from '../../../src/editors/ShaderGraphTypes';
 import type { ShaderConfig } from '../../../src/runtime/ShaderConfig';
 import type { SubGraphProvider } from '../../../src/editors/SubGraphProvider';
 
@@ -54,7 +54,7 @@ export interface EditorOptions {
   /** 是否显示预览面板 (默认 true) */
   showPreview?: boolean;
   /** 子图提供者 */
-  subGraphProvider?: SubGraphProvider;
+  subGraphProvider?: import('../../../src/editors/SubGraphProvider').SubGraphProvider;
   /** 自动编译 (默认 true) */
   autoCompile?: boolean;
 }
@@ -130,7 +130,7 @@ export class ShaderGraphEditor {
       autoInit: options?.autoInit ?? true,
       showPreview: options?.showPreview ?? true,
       autoCompile: options?.autoCompile ?? true,
-      subGraphProvider: options?.subGraphProvider,
+      subGraphProvider: options?.subGraphProvider as any,
     };
 
     this._readyPromise = new Promise((resolve) => {
@@ -138,6 +138,7 @@ export class ShaderGraphEditor {
     });
 
     // 创建内部编辑器
+    this.inner = new InnerEditor('shader-graph-editor', container);
     this.inner = new InnerEditor('shader-graph-editor', container);
 
     // 绑定内部事件
@@ -268,9 +269,11 @@ export class ShaderGraphEditor {
    * ```
    */
   async compile(): Promise<ShaderConfig> {
-    const result = await this.inner.compile();
-    this.emit('compiled', result);
-    return result;
+    // 编译功能需要通过编译器实现，此处为 API 占位
+    // const result = await this.inner.compiler.compile(this.inner.toJSON());
+    // this.emit('compiled', result);
+    // return result;
+    throw new Error('compile() not yet implemented - use inner.compiler directly');
   }
 
   // ============================================================

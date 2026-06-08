@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import DemoPanel from '../components/DemoPanel.vue'
 import ScrollNav from '../components/ScrollNav.vue'
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
-import type { ShaderConfig } from '@shader-graph-glsl/runtime'
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
+import type { ShaderConfig } from '@xifu/shader-graph-glsl/runtime'
 
 // ============================================================
 // 导航项
@@ -40,7 +40,7 @@ void main() {
   fragColor = vec4(vColor, 1.0);
 }`
 
-const demo1_jsCode = `import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+const demo1_jsCode = `import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const runtime = new ShaderGraphRuntime(canvas)
 runtime.resize(400, 300)
@@ -123,7 +123,7 @@ const demo2_config: ShaderConfig = {
   textures: [], parameters: [],
 }
 
-const demo2_jsCode = `import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+const demo2_jsCode = `import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const runtime = new ShaderGraphRuntime(canvas)
 runtime.resize(400, 300)
@@ -207,7 +207,7 @@ void main() {
   fragColor = texture(uTexture, uv);
 }`
 
-const demo3_jsCode = `import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+const demo3_jsCode = `import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const runtime = new ShaderGraphRuntime(canvas)
 runtime.resize(400, 300)
@@ -298,7 +298,7 @@ void main() {
   gl_Position = vec4(aPosition, 1.0);
 }`
 
-const demo4_jsCode = `import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+const demo4_jsCode = `import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const runtime = new ShaderGraphRuntime(canvas)
 
@@ -362,7 +362,7 @@ void main() {
   fragColor = vec4(vColor * uIntensity, 1.0);
 }`
 
-const demo5_jsCode = `import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+const demo5_jsCode = `import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const runtime = new ShaderGraphRuntime(canvas)
 runtime.resize(400, 300)
@@ -441,7 +441,7 @@ const demo5_mainConfig: ShaderConfig = {
 // ============================================================
 
 const threeCode = `import * as THREE from 'three'
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 // 方式一: ShaderConfig 驱动 RawShaderMaterial (推荐)
 const material = new THREE.RawShaderMaterial({
@@ -461,7 +461,7 @@ const runtime = new ShaderGraphRuntime(renderer.domElement)
 // 现在 runtime 和 three.js 共享同一个 WebGL 上下文`
 
 const pixiCode = `import * as PIXI from 'pixi.js'
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 // PixiJS v8 WebGL2 模式
 const app = new PIXI.Application({
@@ -501,7 +501,7 @@ runtime.play((time) => {
 })`
 
 const playcanvasCode = `import * as pc from 'playcanvas'
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 // 方式一: 从 PlayCanvas canvas 创建运行时
 const canvas = app.graphicsDevice.canvas
@@ -514,7 +514,7 @@ material.setFragmentCode(shaderConfig.fragCode)
 material.update()`
 
 const workflowCode = `// === 编辑器侧 ===
-import { ShaderGraphEditor } from '@shader-graph-glsl/editor'
+import { ShaderGraphEditor } from '@xifu/shader-graph-glsl/editor'
 
 const editor = new ShaderGraphEditor(container)
 await editor.createGraph()
@@ -523,7 +523,7 @@ const config = await editor.compile()
 // config 可 JSON 序列化
 
 // === 运行时侧 (独立部署) ===
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const runtime = new ShaderGraphRuntime(canvas)
 const program = runtime.load(config)
@@ -539,7 +539,7 @@ runtime.play((time) => {
 <template>
   <div class="examples-page">
     <h2>🧪 消费者用例</h2>
-    <p class="subtitle">各类渲染环境下使用 @shader-graph-glsl/runtime 的示例，自动运行</p>
+    <p class="subtitle">各类渲染环境下使用 @xifu/shader-graph-glsl/runtime 的示例，自动运行</p>
 
     <!-- 滚动导航 -->
     <ScrollNav :items="navItems" />

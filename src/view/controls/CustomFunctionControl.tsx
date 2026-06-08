@@ -4,17 +4,9 @@ import { ReteCustomFunctionNode } from '../../components';
 import { Rete } from '../../types';
 import ReactDOM from 'react-dom';
 import { stopPropagation } from '../utils';
-import { basicSetup, EditorView } from 'codemirror';
-import { cpp } from '@codemirror/lang-cpp';
-import { Annotation, EditorState } from '@codemirror/state';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { getOffset } from '../../rete/view/utils';
-import { linter, Diagnostic } from '@codemirror/lint';
-import { indentWithTab } from '@codemirror/commands';
-import { indentUnit } from '@codemirror/language';
-import { keymap } from '@codemirror/view';
 
-const External = Annotation.define<boolean>();
+const External = { isExternal: true };
 
 interface CustomFunctionViewProps {
   node: ReteCustomFunctionNode;
@@ -68,8 +60,8 @@ export const CustomFunctionView: FC<CustomFunctionViewProps> = ({ node, onChange
   const rootRef = useRef<HTMLDivElement>();
   const canRef = useRef<HTMLDivElement>();
   const cmCanRef = useRef<HTMLDivElement>();
-  const cmViewRef = useRef<EditorView>();
-  const cmDiagnosticRef = useRef<Diagnostic[]>([]);
+  const cmViewRef = useRef<any>();
+  const [cmContainer, setCmContainer] = useState<HTMLDivElement>();
 
   const onExampleClick = async () => {
     const com = editor.components.get('CustomFunction') as Rete.Component | undefined;
@@ -83,35 +75,88 @@ export const CustomFunctionView: FC<CustomFunctionViewProps> = ({ node, onChange
     }
   };
 
-  // 初始化codemirror
+  // 初始化 monaco editor（当容器就绪且 show 时）
   useEffect(() => {
-    if (!cmCanRef.current) return;
-    cmViewRef.current =
-      cmViewRef.current ||
-      new EditorView({
-        parent: cmCanRef.current,
-        doc: node.data.codeValue,
-        extensions: [
-          basicSetup,
-          cpp(),
-          oneDark,
-          EditorState.tabSize.of(2),
-          keymap.of([indentWithTab]),
-          indentUnit.of(' '),
-          EditorView.theme({ '&': { maxHeight: '600px', maxWidth: '700px' } }),
-          EditorView.updateListener.of(vu => {
-            if (vu.docChanged && !vu.transactions.some(tr => tr.annotation(External))) {
-              onChange('code', vu.state.doc.toString());
-              cmDiagnosticRef.current.length = 0;
-            }
-          }),
-          linter(() => cmDiagnosticRef.current, { delay: 30 }),
-        ],
-      });
-  }, [cmCanRef.current]);
+    if (!cmContainer || !show) return;
+    let viewer: any = null;
+    let cancelled = false;
 
-  // 销毁cm示例
-  useEffect(() => () => cmViewRef.current?.destroy(), []);
+    // 动态加载 monaco-editor（可选依赖）
+    const initMonaco = async () => {
+      try {
+        const monaco = await import('monaco-editor');
+
+        if (cancelled || !cmContainer) return;
+
+        // 注册 GLSL 语言
+        const existing = monaco.languages.getLanguages().find((l: any) => l.id === 'glsl');
+        if (!existing) {
+          monaco.languages.register({ id: 'glsl' });
+          monaco.languages.setMonarchTokensProvider('glsl', {
+            tokenizer: {
+              root: [
+                [/#version.*$/, 'comment'],
+                [/\/\/.*$/, 'comment'],
+                [/\/\*[\s\S]*?\*\//, 'comment'],
+                [/\b(version|precision|highp|mediump|lowp)\b/, 'keyword'],
+                [/\b(float|int|bool|void|double)\b/, 'type'],
+                [/\b(vec[234]|mat[234]|sampler2D|samplerCube)\b/, 'type'],
+                [/\b(attribute|varying|uniform|in|out|inout)\b/, 'keyword'],
+                [/\b(const|struct|if|else|for|while|do|return|break|continue|discard)\b/, 'keyword'],
+                [/\b(true|false)\b/, 'constant'],
+                [/\b(gl_Position|gl_FragCoord|gl_FragColor|gl_PointSize|gl_FrontFacing)\b/, 'predefined'],
+                [/\b(sin|cos|tan|asin|acos|atan|pow|exp|log|sqrt|abs|sign|floor|ceil|fract|mod|min|max|clamp|mix|step|smoothstep|length|distance|dot|cross|normalize|reflect|refract|texture|texture2D|textureCube|radians|degrees)\b/, 'function'],
+                [/[a-zA-Z_]\w*/, 'identifier'],
+                [/\d+\.?\d*/, 'number'],
+                [/[{}()\[\]]/, '@brackets'],
+              ],
+            },
+          });
+        }
+
+        cmContainer.innerHTML = '';
+
+        viewer = monaco.editor.create(cmContainer, {
+          value: node.data.codeValue || '',
+          language: 'glsl',
+          theme: 'vs-dark',
+          minimap: { enabled: false },
+          fontSize: 13,
+          lineNumbers: 'on',
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+        });
+
+        viewer.onDidChangeModelContent(() => {
+          onChange('code', viewer.getValue());
+        });
+
+        cmViewRef.current = viewer;
+      } catch {
+        // monaco-editor 未安装，降级显示 textarea
+        if (cmContainer) {
+          cmContainer.innerHTML =
+            '<textarea class="sg-custom-fn-textarea-fallback" placeholder="monaco-editor not installed. Install it as optional dependency to enable code editing." style="width:100%;height:300px;background:#1e1e1e;color:#ccc;border:1px solid #333;padding:8px;font-family:monospace;font-size:13px"></textarea>';
+          const ta = cmContainer.querySelector('textarea');
+          if (ta) {
+            ta.value = node.data.codeValue || '';
+            ta.oninput = () => onChange('code', ta.value);
+          }
+        }
+      }
+    };
+
+    initMonaco();
+
+    return () => {
+      cancelled = true;
+      if (viewer) {
+        viewer.dispose();
+        viewer = null;
+        cmViewRef.current = null;
+      }
+    };
+  }, [cmContainer, show]);
 
   // 位置同步
   useEffect(() => {
@@ -185,7 +230,7 @@ export const CustomFunctionView: FC<CustomFunctionViewProps> = ({ node, onChange
                 示例
               </button>
             </div>
-            <div className="sg-custom-fn-body sg-custom-fn-editor" ref={el => (cmCanRef.current = el!)} />
+            <div className="sg-custom-fn-body sg-custom-fn-editor" ref={el => { if (el) { cmCanRef.current = el; setCmContainer(el!); } }} />
           </div>
         </div>,
         editor.view.container,

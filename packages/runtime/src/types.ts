@@ -1,5 +1,5 @@
 /**
- * @shader-graph-glsl/runtime — 公共类型定义
+ * @xifu/shader-graph-glsl/runtime — 公共类型定义
  */
 
 import type { UniformMeta, UniformValues } from '../../../src/runtime/ShaderConfig';

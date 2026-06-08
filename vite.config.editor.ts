@@ -22,8 +22,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@shader-graph-glsl/runtime': resolve(__dirname, 'packages/runtime/src'),
-      '@shader-graph-glsl/editor': resolve(__dirname, 'packages/editor/src'),
+      '@xifu/shader-graph-glsl/runtime': resolve(__dirname, 'packages/runtime/src'),
+      '@xifu/shader-graph-glsl/editor': resolve(__dirname, 'packages/editor/src'),
     },
   },
 })

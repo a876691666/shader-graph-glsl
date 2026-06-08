@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-# Editor build output (static assets for docs)
+# Editor build output (static assets for docs, not npm dist)
 apps/docs/public/editor
 
 # Editor directories and files

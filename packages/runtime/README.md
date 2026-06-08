@@ -1,6 +1,8 @@
-# @shader-graph-glsl/runtime
+# @xifu/shader-graph-glsl/runtime
 
 轻量、独立的 WebGL2 着色器运行时引擎。
+
+> 作为 `@xifu/shader-graph-glsl` 的子路径使用：`pnpm add @xifu/shader-graph-glsl`
 
 ## 特性
 
@@ -14,13 +16,11 @@
 ## 安装
 
 ```bash
-pnpm add @shader-graph-glsl/runtime
+pnpm add @xifu/shader-graph-glsl
 ```
 
-## 快速开始
-
 ```ts
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
 const runtime = new ShaderGraphRuntime(canvas)
@@ -42,6 +42,4 @@ runtime.draw({
 })
 ```
 
-## API
-
-参见 [API 文档](https://deepkolos.github.io/shader-graph-glsl/#/api)。
+参见 [API 文档](https://a876691666.github.io/shader-graph-glsl/#/api)。

@@ -1,5 +1,5 @@
 /**
- * @shader-graph-glsl/editor
+ * @xifu/shader-graph-glsl/editor
  * ==========================
  *
  * 可视化着色器图编辑器。
@@ -30,7 +30,7 @@ export type {
 
 export type {
   /** 编辑器图数据结构 */
-  GraphData,
+  ShaderGraphData as GraphData,
   /** 着色器图节点数据 */
   SGNodeData,
   /** 着色器图节点集合 */
@@ -38,7 +38,7 @@ export type {
   /** 编辑器设置 */
   SGSetting,
   /** 设置配置 */
-  SGSettingValueCfg,
+  SGSettingValueCfgs,
 } from '../../../src/editors/ShaderGraphTypes';
 
 export type {
@@ -59,4 +59,4 @@ export type {
   UniformValue,
   /** Uniform 值集合 */
   UniformValues,
-} from '@shader-graph-glsl/runtime';
+} from '../../runtime/src/index';

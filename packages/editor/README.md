@@ -1,6 +1,8 @@
-# @shader-graph-glsl/editor
+# @xifu/shader-graph-glsl/editor
 
 基于 Rete.js 的可视化着色器图编辑器。
+
+> 作为 `@xifu/shader-graph-glsl` 的子路径使用：`pnpm add @xifu/shader-graph-glsl`
 
 ## 特性
 
@@ -14,15 +16,13 @@
 ## 安装
 
 ```bash
-pnpm add @shader-graph-glsl/editor
+pnpm add @xifu/shader-graph-glsl
 ```
 
 需要 peer 依赖: `react`, `react-dom`, `three`
 
-## 快速开始
-
 ```ts
-import { ShaderGraphEditor } from '@shader-graph-glsl/editor'
+import { ShaderGraphEditor } from '@xifu/shader-graph-glsl/editor'
 
 const container = document.getElementById('editor')!
 const editor = new ShaderGraphEditor(container)
@@ -41,4 +41,4 @@ editor.load(json)
 
 ## API
 
-参见 [API 文档](https://deepkolos.github.io/shader-graph-glsl/#/api)。
+参见 [API 文档](https://a876691666.github.io/shader-graph-glsl/#/api)。

@@ -36,7 +36,7 @@ function navigate(path: string) {
         </nav>
         <a
           class="github-link"
-          href="https://github.com/deepkolos/shader-graph-glsl"
+          href="https://github.com/a876691666/shader-graph-glsl"
           target="_blank"
         >
           GitHub
@@ -49,7 +49,7 @@ function navigate(path: string) {
     </main>
 
     <footer class="footer">
-      <p>MIT License · deepkolos/shader-graph-glsl</p>
+      <p>MIT License · a876691666/shader-graph-glsl</p>
     </footer>
   </div>
 </template>

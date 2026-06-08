@@ -43,7 +43,10 @@
 
   &-editor {
     text-align: left;
-    font-size: 18px;
+    min-height: 300px;
+    height: 300px;
+    width: 600px;
+    position: relative;
 
     .cm-tooltip {
       // Transform 生成的staking context fixed 也不再 fixed
@@ -53,5 +56,17 @@
       bottom: 0 !important;
       transform: translateY(100%);
     }
+  }
+
+  &-textarea-fallback {
+    width: 100%;
+    height: 300px !important;
+    background: #1e1e1e;
+    color: #ccc;
+    border: 1px solid #333;
+    padding: 8px;
+    font-family: monospace;
+    font-size: 13px;
+    resize: vertical;
   }
 }

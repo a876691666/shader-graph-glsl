@@ -62,15 +62,15 @@ const router = useRouter()
       <div class="card">
         <h3>安装</h3>
         <pre><code># 运行时 (轻量，无依赖)
-pnpm add @shader-graph-glsl/runtime
+pnpm add @xifu/shader-graph-glsl
 
 # 编辑器 (需要 React + Three.js)
-pnpm add @shader-graph-glsl/editor</code></pre>
+pnpm add @xifu/shader-graph-glsl</code></pre>
       </div>
 
       <div class="card">
         <h3>运行时最小用例</h3>
-        <pre><code><span class="hl kw">import</span> <span class="hl">{ ShaderGraphRuntime }</span> <span class="hl">from</span> <span class="hl s">'@shader-graph-glsl/runtime'</span>
+        <pre><code><span class="hl kw">import</span> <span class="hl">{ ShaderGraphRuntime }</span> <span class="hl">from</span> <span class="hl s">'@xifu/shader-graph-glsl/runtime'</span>
 
 <span class="hl c">// 创建运行时</span>
 <span class="hl kw">const</span> runtime <span class="hl op">=</span> <span class="hl kw">new</span> <span class="hl t">ShaderGraphRuntime</span>(<span class="hl builtin">document</span>.<span class="hl fu">getElementById</span>(<span class="hl s">'canvas'</span>) <span class="hl kw">as</span> HTMLCanvasElement)

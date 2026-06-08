@@ -1,31 +1,17 @@
 {
-  "name": "@shader-graph-glsl/runtime",
+  "name": "@xifu/internal-runtime",
   "version": "0.1.0",
-  "description": "Shader Graph GLSL Runtime Engine — lightweight WebGL2 renderer, framework-agnostic",
+  "private": false,
+  "description": "Shader Graph GLSL Runtime Engine — internal source package",
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
-  "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
-    }
-  },
-  "files": [
-    "src",
-    "README.md"
-  ],
   "scripts": {
-    "test": "echo 'No tests yet'"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
-  "keywords": [
-    "shader-graph",
-    "glsl",
-    "webgl2",
-    "runtime",
-    "renderer"
-  ],
+  "keywords": [],
   "license": "MIT",
   "peerDependencies": {},
   "dependencies": {}

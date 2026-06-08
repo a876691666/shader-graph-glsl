@@ -4,11 +4,11 @@
 <template>
   <div class="api-page">
     <h2>📖 API 文档</h2>
-    <p class="subtitle">@shader-graph-glsl/runtime · @shader-graph-glsl/editor</p>
+    <p class="subtitle">@xifu/shader-graph-glsl/runtime · @xifu/shader-graph-glsl/editor</p>
 
     <!-- ===== Runtime ===== -->
     <section class="section">
-      <h2>@shader-graph-glsl/runtime</h2>
+      <h2>@xifu/shader-graph-glsl/runtime</h2>
       <p>轻量、独立的 WebGL2 运行时引擎，无第三方框架依赖。</p>
 
       <!-- ShaderGraphRuntime -->
@@ -138,7 +138,7 @@
 
     <!-- ===== Editor ===== -->
     <section class="section">
-      <h2>@shader-graph-glsl/editor</h2>
+      <h2>@xifu/shader-graph-glsl/editor</h2>
       <p>基于 Rete.js 的可视化着色器图编辑器。</p>
 
       <div class="card api-card">

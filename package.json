@@ -1,33 +1,45 @@
 {
-  "name": "shader-graph-glsl",
+  "name": "@xifu/shader-graph-glsl",
   "version": "0.1.0",
-  "private": true,
-  "description": "shader graph for GLSL (WebGL2 / renderer-agnostic) — monorepo",
+  "description": "Shader Graph GLSL — visual node-based shader editor & runtime engine",
+  "type": "module",
+  "private": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "import": "./dist/runtime/index.js"
+    },
+    "./editor": {
+      "types": "./dist/editor/index.d.ts",
+      "import": "./dist/editor/index.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "dev:docs": "pnpm --filter @shader-graph-glsl/docs dev",
+    "dev:docs": "pnpm --filter @xifu/shader-graph-glsl-docs dev",
     "build": "tsc && vite build",
+    "build:npm": "tsup",
     "build:editor": "vite build --config vite.config.editor.ts && pnpm -s exec node -e \"require('fs').renameSync('apps/docs/public/editor/editor.html','apps/docs/public/editor/index.html')\"",
-    "build:docs": "pnpm build:editor && pnpm --filter @shader-graph-glsl/docs build",
+    "build:docs": "pnpm build:editor && pnpm --filter @xifu/shader-graph-glsl-docs build",
     "preview": "vite preview",
-    "preview:docs": "pnpm --filter @shader-graph-glsl/docs preview"
+    "preview:docs": "pnpm --filter @xifu/shader-graph-glsl-docs preview",
+    "prepublishOnly": "pnpm build:npm"
   },
   "keywords": [
     "node material",
     "shader graph",
     "glsl",
-    "webgl2"
+    "webgl2",
+    "node-editor",
+    "visual-programming"
   ],
-  "author": "deepkolos@qq.com",
+  "author": "928200728@qq.com",
+  "license": "MIT",
   "dependencies": {
-    "@codemirror/commands": "^6.3.3",
-    "@codemirror/lang-cpp": "^6.0.3",
-    "@codemirror/language": "^6.10.1",
-    "@codemirror/lint": "^6.4.2",
-    "@codemirror/state": "^6.0.1",
-    "@codemirror/theme-one-dark": "^6.1.2",
-    "@codemirror/view": "^6.25.1",
-    "codemirror": "^6.0.1",
     "copy-to-clipboard": "3.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -41,8 +53,19 @@
     "@types/three": "^0.150.2",
     "@vitejs/plugin-react": "^3.1.0",
     "less": "^4.1.3",
+    "tsup": "^8.5.1",
     "typescript": "^4.9.3",
     "vite": "^4.5.2"
   },
-  "license": "MIT"
+  "peerDependencies": {
+    "monaco-editor": "^0.45.0"
+  },
+  "peerDependenciesMeta": {
+    "monaco-editor": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

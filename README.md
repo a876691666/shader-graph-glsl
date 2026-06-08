@@ -5,21 +5,21 @@
 ## 📦 双包架构
 
 ```
-@shader-graph-glsl/runtime    — 轻量运行时引擎 (零外部依赖，纯 WebGL2)
-@shader-graph-glsl/editor     — 可视化编辑器 (基于 Rete.js + React + Three.js)
+@xifu/shader-graph-glsl/runtime    — 轻量运行时引擎 (零外部依赖，纯 WebGL2)
+@xifu/shader-graph-glsl/editor     — 可视化编辑器 (基于 Rete.js + React + Three.js)
 ```
 
 | 包 | 描述 | 依赖 |
 |---|---|---|
-| `@shader-graph-glsl/runtime` | 独立 WebGL2 渲染引擎，加载 ShaderConfig 渲染 | 无 |
-| `@shader-graph-glsl/editor` | 可视化节点编辑器，编译产出 ShaderConfig | React, Three.js |
+| `@xifu/shader-graph-glsl/runtime` | 独立 WebGL2 渲染引擎，加载 ShaderConfig 渲染 | 无 |
+| `@xifu/shader-graph-glsl/editor` | 可视化节点编辑器，编译产出 ShaderConfig | React, Three.js |
 
 ## 🚀 快速开始
 
 ### 运行时最小用例
 
 ```ts
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime'
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime'
 
 const runtime = new ShaderGraphRuntime(canvas)
 const program = runtime.load(shaderConfig)  // ShaderConfig 由编辑器编译产出
@@ -38,7 +38,7 @@ runtime.draw({
 ### 编辑器最小用例
 
 ```ts
-import { ShaderGraphEditor } from '@shader-graph-glsl/editor'
+import { ShaderGraphEditor } from '@xifu/shader-graph-glsl/editor'
 
 const editor = new ShaderGraphEditor(document.getElementById('editor')!)
 await editor.createGraph()
@@ -49,8 +49,8 @@ const config = await editor.compile()
 
 ## 📖 文档
 
-- [API 文档](https://deepkolos.github.io/shader-graph-glsl/#/api)
-- [使用用例](https://deepkolos.github.io/shader-graph-glsl/#/examples)
+- [API 文档](https://a876691666.github.io/shader-graph-glsl/#/api)
+- [使用用例](https://a876691666.github.io/shader-graph-glsl/#/examples)
   - Three.js 集成
   - PixiJS 集成  
   - 原生 WebGL2

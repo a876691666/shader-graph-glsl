@@ -1,6 +1,6 @@
 {
-  "name": "@shader-graph-glsl/docs",
-  "private": true,
+  "name": "@xifu/shader-graph-glsl-docs",
+  "private": false,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
     "vue-router": "^4.3.0",
     "three": "^0.151.3",
     "pixi.js": "^8.0.0",
-    "@shader-graph-glsl/runtime": "workspace:*"
+    "@xifu/shader-graph-glsl": "workspace:*"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",

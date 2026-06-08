@@ -3,7 +3,7 @@
  * 原生 WebGL2 — 完整自定义渲染示例
  * ============================================================
  *
- * 展示如何使用 @shader-graph-glsl/runtime 在原生 WebGL2 环境中
+ * 展示如何使用 @xifu/shader-graph-glsl/runtime 在原生 WebGL2 环境中
  * 进行完整的渲染管线控制。
  *
  * 包含:
@@ -14,8 +14,8 @@
  * @packageDocumentation
  */
 
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime';
-import type { ShaderConfig } from '@shader-graph-glsl/runtime';
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime';
+import type { ShaderConfig } from '@xifu/shader-graph-glsl/runtime';
 
 /**
  * 纹理渲染示例

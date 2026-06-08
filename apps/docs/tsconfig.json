@@ -12,8 +12,8 @@
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "@shader-graph-glsl/runtime": ["../../packages/runtime/src"],
-      "@shader-graph-glsl/editor": ["../../packages/editor/src"]
+      "@xifu/shader-graph-glsl/runtime": ["../../packages/runtime/src"],
+      "@xifu/shader-graph-glsl/editor": ["../../packages/editor/src"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.d.ts"],

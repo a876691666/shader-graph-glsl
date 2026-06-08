@@ -1,5 +1,5 @@
 /**
- * @shader-graph-glsl/runtime
+ * @xifu/shader-graph-glsl/runtime
  * ===========================
  *
  * 轻量、独立的 WebGL2 着色器运行时引擎。

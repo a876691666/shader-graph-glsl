@@ -3,7 +3,7 @@
  * 最小化运行时示例 — 纯 WebGL2 渲染彩色三角形
  * ============================================================
  *
- * 这个示例展示 @shader-graph-glsl/runtime 的最小用法。
+ * 这个示例展示 @xifu/shader-graph-glsl/runtime 的最小用法。
  * 无需编辑器，直接手写 GLSL 加载到运行时渲染。
  *
  * 运行方式:
@@ -13,7 +13,7 @@
  * @packageDocumentation
  */
 
-import { ShaderGraphRuntime } from '@shader-graph-glsl/runtime';
+import { ShaderGraphRuntime } from '@xifu/shader-graph-glsl/runtime';
 
 /**
  * 最小化使用示例
