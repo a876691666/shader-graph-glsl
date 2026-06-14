@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -12,10 +12,10 @@
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "@xifu/shader-graph-glsl/runtime": ["../../packages/runtime/src"],
-      "@xifu/shader-graph-glsl/editor": ["../../packages/editor/src"]
+      "@xifu/shader-graph-glsl/runtime": ["../packages/runtime/src"],
+      "@xifu/shader-graph-glsl/editor": ["../packages/editor/src"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

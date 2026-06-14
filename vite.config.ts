@@ -4,10 +4,10 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 
 /**
- * 开发服务器下将 /shader-graph-glsl/editor/ 的请求映射到 apps/docs/public/editor/
+ * 开发服务器下将 /shader-graph-glsl/editor/ 的请求映射到 docs/public/editor/
  */
 function editorDevServerPlugin() {
-  const editorDir = resolve(__dirname, 'apps/docs/public/editor')
+  const editorDir = resolve(__dirname, 'docs/public/editor')
   return {
     name: 'editor-dev-server',
     configureServer(server: any) {

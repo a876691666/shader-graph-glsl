@@ -24,8 +24,8 @@
     "dev:docs": "pnpm --filter @xifu/shader-graph-glsl-docs dev",
     "build": "tsc && vite build",
     "build:npm": "tsup",
-    "build:editor": "vite build --config vite.config.editor.ts && pnpm -s exec node -e \"require('fs').renameSync('apps/docs/public/editor/editor.html','apps/docs/public/editor/index.html')\"",
-    "build:docs": "pnpm build:editor && pnpm --filter @xifu/shader-graph-glsl-docs build",
+    "build:editor": "vite build --config vite.config.editor.ts && pnpm -s exec node -e \"require('fs').renameSync('docs/public/editor/editor.html','docs/public/editor/index.html')\"",
+    "build:docs": "pnpm --filter @xifu/shader-graph-glsl-docs build",
     "preview": "vite preview",
     "preview:docs": "pnpm --filter @xifu/shader-graph-glsl-docs preview",
     "prepublishOnly": "pnpm build:npm"

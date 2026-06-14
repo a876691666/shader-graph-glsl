@@ -1,0 +1,62 @@
+/**
+ * Editor layout styles
+ *
+ * 编辑器页面的布局和工具栏样式。
+ * 与 example/index.css 保持一致的视觉效果。
+ */
+
+/* ===== 工具栏 ===== */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  background: #1a1c25;
+  border-bottom: 1px solid #2a2d3a;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.btn {
+  margin: 2px;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border: 1px solid #2a2d3a;
+  border-radius: 6px;
+  background: #24262f;
+  color: #c8ccd6;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.btn:hover {
+  border-color: #6c8cff;
+  background: rgba(108, 140, 255, 0.08);
+  color: #e1e4ed;
+}
+
+/* ===== 编辑器容器 (Rete 挂载点) ===== */
+.sg-editor {
+  flex: auto;
+  position: relative;
+  text-align: left;
+}
+
+/* ===== 输入控件重置 ===== */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type='color']::-webkit-color-swatch {
+  border: 0;
+}

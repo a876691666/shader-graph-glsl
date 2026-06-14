@@ -13,7 +13,7 @@ dist-ssr
 *.local
 
 # Editor build output (static assets for docs, not npm dist)
-apps/docs/public/editor
+docs/public/editor
 
 # Generated CSS from LESS prebuild
 packages/editor/src/editor.css

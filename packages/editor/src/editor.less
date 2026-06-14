@@ -2,7 +2,9 @@
  * Editor styles entry
  *
  * 聚合所有视图组件的 LESS 样式，供 prebuild 编译为 editor.css。
+ * 也包含页面布局/工具栏样式，使 npm 包消费者无需额外引入 CSS。
  */
+@import './editor-layout.less';
 @import '../../../src/view/Rete.less';
 @import '../../../src/view/Block.less';
 @import '../../../src/view/Node.less';
