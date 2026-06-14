@@ -125,8 +125,7 @@ export class PreviewServer {
 
     // resize
     this.resizeObserver = new ResizeObserver(() => {
-      this.canvas.width = this.canvas.clientWidth * this.dpr;
-      this.canvas.height = this.canvas.clientHeight * this.dpr;
+      this.dpr = devicePixelRatio;
       this.renderer.setPixelRatio(this.dpr);
       this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
     });
@@ -163,10 +162,9 @@ export class PreviewServer {
     this.mainMaterial.sg.update(deltaTime);
     this.control?.update();
 
-    // 清除画布 (透明背景)
-    const { width, height } = this.canvas;
-    this.renderer.setScissor(0, 0, width, height);
-    this.renderer.setViewport(0, 0, width, height);
+    // 清除画布 (透明背景) — Three.js setViewport/setScissor 内部会乘以 pixelRatio，所以传入 CSS 像素值
+    this.renderer.setScissor(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
+    this.renderer.setViewport(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
     this.renderer.clear(true, true, false);
 
     if (!this.updatingMaterial) [...this.clients.values()].sort((a, b) => a.weight - b.weight).forEach(this.renderClient);
@@ -252,11 +250,10 @@ export class PreviewServer {
       const { width, height, top: cy, left: cx } = client.canvas.getBoundingClientRect();
       const x = cx - px;
       // DOM坐标原点在左上，WebGL framebuffer 原点在左下，需要翻转Y
-      const y = this.canvas.height / this.dpr - (cy - py) - height;
-      const w = Math.round(width * this.dpr);
-      const h = Math.round(height * this.dpr);
-      this.renderer.setScissor(x * this.dpr, y * this.dpr, w, h);
-      this.renderer.setViewport(x * this.dpr, y * this.dpr, w, h);
+      // Three.js setViewport/setScissor 内部会乘以 pixelRatio，所以传入 CSS 像素值
+      const y = this.canvas.clientHeight - (cy - py) - height;
+      this.renderer.setScissor(x, y, width, height);
+      this.renderer.setViewport(x, y, width, height);
       this.renderer.render(this.scene, camera);
       if (client.node) this.floor.visible = floorVisible;
     }
